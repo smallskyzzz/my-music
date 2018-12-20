@@ -13,10 +13,13 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
+  @import "../../common/stylus/variable"
   .tab
     display flex
+    z-index 100
     .tab-item
       flex 1
       text-align center
       line-height 40px
+      color $color-text
 </style>

@@ -2,8 +2,6 @@
   <div id="app">
     <tab></tab>
     <router-view></router-view>
-    <h1>123</h1>
-    <h2>123</h2>
   </div>
 </template>
 
