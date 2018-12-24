@@ -1,17 +1,18 @@
 <template>
   <scroll class="recommend">
     <div>
-    <slider class="slider">
-      <div v-for="(item, index) in banners" :key="index">
-        <img width="100%" :src="item.imageUrl"/>
+      <slider class="slider">
+        <div v-for="(item, index) in banners" :key="index">
+          <img width="100%" :src="item.imageUrl"/>
+        </div>
+      </slider>
+      <h1 class="title">推荐歌单</h1>
+      <div class="personalized">
+        <div class="item" v-for="(item, index) in personalized" :key="index">
+          <img width="100%" v-lazy="item.picUrl"/>
+        </div>
       </div>
-    </slider>
-    <h1 class="title">推荐歌单</h1>
-    <div class="personalized">
-      <div class="item" v-for="(item, index) in personalized" :key="index">
-        <img width="100%" :src="item.picUrl"/>
-      </div>
-    </div></div>
+    </div>
   </scroll>
 </template>
 
@@ -58,6 +59,7 @@ export default {
   @import "../../common/stylus/variable"
   .recommend
     position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
+    overflow hidden
     width 100%
     top 40px
     bottom 0
@@ -73,7 +75,8 @@ export default {
     .personalized
       margin 0 5px
       .item
-        margin 5px 5px
         display inline-block
-        width 30%
+        box-sizing border-box
+        width 33.3%
+        padding 5px
 </style>

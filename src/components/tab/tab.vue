@@ -1,9 +1,9 @@
 <template>
   <div class="tab">
     <router-link class="tab-item" to="/recommend">推荐</router-link>
-    <router-link class="tab-item" to="/recommend">歌手</router-link>
-    <router-link class="tab-item" to="/recommend">排行</router-link>
-    <router-link class="tab-item" to="/recommend">搜索</router-link>
+    <router-link class="tab-item" to="/singer">歌手</router-link>
+    <router-link class="tab-item" to="/rank">排行</router-link>
+    <router-link class="tab-item" to="/search">搜索</router-link>
   </div>
 </template>
 
@@ -22,4 +22,6 @@ export default {
       text-align center
       line-height 40px
       color $color-text
+      &.active
+        color $color-theme
 </style>
