@@ -70,7 +70,7 @@ export default {
     .title
       line-height 30px
       text-align center
-      font-size $font-size-medium
+      font-size $font-size-max
       color $color-theme
     .personalized
       margin 0 5px
