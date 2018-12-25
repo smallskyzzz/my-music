@@ -1,8 +1,8 @@
 <template>
-  <scroll class="recommend">
+  <scroll class="recommend" :data="arrs">
     <div>
       <slider class="slider">
-        <div v-for="(item, index) in banners" :key="index">
+        <div v-for="(item, index) in banners" :key="index" class="item">
           <img width="100%" :src="item.imageUrl"/>
         </div>
       </slider>
@@ -26,6 +26,11 @@ export default {
     return {
       banners: [], // 轮播
       personalized: [] // 推荐歌单
+    }
+  },
+  computed: {
+    arrs() {
+      return this.banners.concat(this.personalized)
     }
   },
   created() {
@@ -67,6 +72,8 @@ export default {
       position relative
       width 100%
       overflow hidden
+      .item
+        width 100%
     .title
       line-height 30px
       text-align center

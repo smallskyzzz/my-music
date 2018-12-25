@@ -1,8 +1,8 @@
 <template>
-  <scroll class="singer" ref="singer">
+  <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList">
     <div>
       <ul>
-        <li v-for="(singer,index) in singerList" :key="index" class="singer-item">
+        <li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem">
           <div class="image">
             <img height="50" width="50" v-lazy="singer.image">
           </div>
@@ -12,7 +12,7 @@
     </div>
     <div class="shortcut">
       <ul>
-        <li v-for="(singer, index) in singers" :key="index" class="item">
+        <li v-for="(singer, index) in singers" :key="index" class="item" :class="{'current':index === currentIndex}">
           <span>{{singer.shortcut}}</span>
         </li>
       </ul>
@@ -26,19 +26,57 @@ import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
 
 const pinyin = require('pinyin')
+const HEIGHT = 60 // 每个li的高度
 
 export default {
   data() {
     return {
       singers: [], // 处理好的数据结构
-      singerList: [] // 歌手一维数组
+      singerList: [], // 歌手一维数组
+      listHeight: [], // 计算每个shortcut的height
+      // currentIndex: 0, // 当前shortcut的index
+      posY: 0 // 当前滚动的y值
     }
   },
   created() {
     this._getSinger()
     // console.log(pinyin('a'))
+    setTimeout(() => {
+      this._calculateHeight() // 计算每个shortcut对应的高度
+    }, 20)
+  },
+  computed: {
+    currentIndex() {
+      if (this.posY >= 0) {
+        return 0
+      } else {
+        for (let i = 0; i < this.listHeight.length - 1; i++) {
+          if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
+            return i
+          }
+        }
+      }
+    }
   },
   methods: {
+    scrollY(posY) {
+      // if (posY >= 0) {
+      //   this.currentIndex = 0
+      // } else {
+      //   for (let i = 0; i < this.listHeight.length - 1; i++) {
+      //     if (-posY > this.listHeight[i] && -posY < this.listHeight[i + 1]) {
+      //       this.currentIndex = i
+      //     }
+      //   }
+      // }
+      // console.log(this.currentIndex + ';' + posY)
+      this.posY = posY
+    },
+    // clickShortcut(index) {
+    //   let singerItem = this.$refs.singerItem
+    //   console.log(singerItem)
+    //   this.$refs.singer.scrollToElement(singerItem[index], 0)
+    // },
     _getSinger() {
       getSinger().then((res) => {
         if (res.data.code === 200) {
@@ -83,6 +121,22 @@ export default {
         singers: singers.slice(0, 10)
       })
       return ret // 此处ret即为得到的想要的数据结构
+    },
+    _calculateHeight() {
+      let height = HEIGHT
+      let heights = []
+      heights.push(0) // 第一项加个0
+      this.singers.forEach((singer) => {
+        heights.push(singer.singers.length * height)
+      })
+      for (let i = 0; i < heights.length; i++) {
+        let singerHeight = 0
+        for (let j = 0; j <= i; j++) {
+          singerHeight += heights[j]
+        }
+        this.listHeight.push(singerHeight)
+      }
+      // console.log(this.listHeight)
     }
   },
   components: {

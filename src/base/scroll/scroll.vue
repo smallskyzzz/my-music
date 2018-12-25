@@ -8,17 +8,36 @@
 import BScroll from 'better-scroll'
 
 export default {
+  props: {
+    data: {
+      type: Array,
+      default: null
+    }
+  },
   mounted() {
-    this.$nextTick(() => {
-      this._initScroll() // 此处初始化应在dom渲染完毕后
-    })
+    setTimeout(() => {
+      this._initScroll()
+    }, 20)
   },
   methods: {
+    refresh() {
+      this.scroll && this.scroll.refresh()
+    },
     _initScroll() {
       this.scroll = new BScroll(this.$refs.wrapper, {
-        probeType: this.probeType,
+        probeType: 3, // 此处设为3才能监听到滚动事件
         click: true
       })
+      this.scroll.on('scroll', (pos) => {
+        this.$emit('scrollY', pos.y)
+      })
+    }
+  },
+  watch: {
+    data() {
+      setTimeout(() => {
+        this.scroll.refresh()
+      }, 20)
     }
   },
   components: {
