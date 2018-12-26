@@ -5,14 +5,12 @@
     <div class="image">
       <img width="100%" height="300" :src="singer.image">
     </div>
-    <scroll :data="songs">
-      <div>
-        <ul v-show="songs.length > 0" class="songs">
+    <scroll :data="songs" class="songs">
+        <ul v-show="songs.length > 0">
           <li v-for="(song, index) in songs" :key="index" class="song">
             {{song.name}}
           </li>
         </ul>
-      </div>
     </scroll>
     <loading v-show="songs.length === 0"></loading>
   </div>
@@ -32,13 +30,19 @@ export default {
     }
   },
   created() {
-    this._getSongBySinger()
+    setTimeout(() => {
+      this._getSongBySinger()
+    }, 20)
   },
   methods: {
     back() {
       this.$router.back()
     },
     _getSongBySinger() {
+      if (!this.singer.id) {
+        this.$router.back()
+        return
+      }
       getSongBySinger(this.singer.id).then((res) => {
         console.log(res)
         if (res.data.code === 200) {
@@ -86,6 +90,11 @@ export default {
   .image
     height 300px
   .songs
+    position absolute
+    top 300px
+    bottom 0
+    left 0
+    right 0
     overflow hidden
     .song
       margin 5px
