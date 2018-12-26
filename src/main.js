@@ -6,7 +6,7 @@ import router from './router'
 import ElementUI from 'element-ui'
 import VueLazyLoad from 'vue-lazyload'
 
-// import 'element-ui/packages/theme-chalk/src/index.scss'
+import 'element-ui/packages/theme-chalk/src/index.scss'
 import './common/stylus/index.styl'
 
 Vue.config.productionTip = false

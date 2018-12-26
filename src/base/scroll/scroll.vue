@@ -14,7 +14,7 @@ export default {
       default: null
     }
   },
-  mounted() {
+  created() {
     setTimeout(() => {
       this._initScroll()
     }, 20)
@@ -22,6 +22,9 @@ export default {
   methods: {
     refresh() {
       this.scroll && this.scroll.refresh()
+    },
+    scrollToElement() {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     },
     _initScroll() {
       this.scroll = new BScroll(this.$refs.wrapper, {

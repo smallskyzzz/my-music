@@ -12,7 +12,7 @@
     </div>
     <div class="shortcut">
       <ul>
-        <li v-for="(singer, index) in singers" :key="index" class="item" :class="{'current':index === currentIndex}">
+        <li v-for="(singer, index) in singers" :key="index" class="item" :class="{'current':index === currentIndex}" @click="clickShortcut(index)">
           <span>{{singer.shortcut}}</span>
         </li>
       </ul>
@@ -34,7 +34,7 @@ export default {
       singers: [], // 处理好的数据结构
       singerList: [], // 歌手一维数组
       listHeight: [], // 计算每个shortcut的height
-      // currentIndex: 0, // 当前shortcut的index
+      currentIndex: 0, // 当前shortcut的index
       posY: 0 // 当前滚动的y值
     }
   },
@@ -45,14 +45,14 @@ export default {
       this._calculateHeight() // 计算每个shortcut对应的高度
     }, 20)
   },
-  computed: {
-    currentIndex() {
-      if (this.posY >= 0) {
-        return 0
+  watch: {
+    posY(newVal) {
+      if (newVal >= 0) {
+        this.currentIndex = 0
       } else {
         for (let i = 0; i < this.listHeight.length - 1; i++) {
-          if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
-            return i
+          if (-newVal > this.listHeight[i] && -newVal < this.listHeight[i + 1]) {
+            this.currentIndex = i
           }
         }
       }
@@ -72,11 +72,15 @@ export default {
       // console.log(this.currentIndex + ';' + posY)
       this.posY = posY
     },
-    // clickShortcut(index) {
-    //   let singerItem = this.$refs.singerItem
-    //   console.log(singerItem)
-    //   this.$refs.singer.scrollToElement(singerItem[index], 0)
-    // },
+    clickShortcut(index) {
+      let singerItem = this.$refs.singerItem
+      let nums = 0
+      for (let i = 0; i < index; i++) {
+        nums += this.singers[i].singers.length
+      }
+      this.currentIndex = index
+      this.$refs.singer.scrollToElement(singerItem[nums], 0)
+    },
     _getSinger() {
       getSinger().then((res) => {
         if (res.data.code === 200) {
