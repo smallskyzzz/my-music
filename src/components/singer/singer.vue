@@ -1,29 +1,33 @@
 <template>
-  <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList">
-    <div>
-      <ul>
-        <li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem">
-          <div class="image">
-            <img height="50" width="50" v-lazy="singer.image">
-          </div>
-          <span class="name">{{singer.name}}</span>
-        </li>
-      </ul>
-    </div>
-    <div class="shortcut">
-      <ul>
-        <li v-for="(singer, index) in singers" :key="index" class="item" :class="{'current':index === currentIndex}" @click="clickShortcut(index)">
-          <span>{{singer.shortcut}}</span>
-        </li>
-      </ul>
-    </div>
-  </scroll>
+  <div>
+    <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList">
+      <div>
+        <ul>
+          <li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem" @click="selectItem(singer)">
+            <div class="image">
+              <img height="50" width="50" v-lazy="singer.image">
+            </div>
+            <span class="name">{{singer.name}}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="shortcut">
+        <ul>
+          <li v-for="(singer, index) in singers" :key="index" class="item" :class="{'current':index === currentIndex}" @click="clickShortcut(index)">
+            <span>{{singer.shortcut}}</span>
+          </li>
+        </ul>
+      </div>
+    </scroll>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
 import {getSinger} from '../../api/singer'
 import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
+import {mapMutations} from 'vuex'
 
 const pinyin = require('pinyin')
 const HEIGHT = 60 // 每个li的高度
@@ -81,6 +85,12 @@ export default {
       this.currentIndex = index
       this.$refs.singer.scrollToElement(singerItem[nums], 0)
     },
+    selectItem(singer) {
+      this.$router.push({
+        path: `/singer/${singer.name}`
+      })
+      this.setSinger(singer)
+    },
     _getSinger() {
       getSinger().then((res) => {
         if (res.data.code === 200) {
@@ -101,7 +111,8 @@ export default {
       list.forEach((item) => {
         singers.push(new Singer({
           name: item.name,
-          image: item.picUrl
+          image: item.picUrl,
+          id: item.id
         }))
       })
       let ret = []
@@ -141,7 +152,10 @@ export default {
         this.listHeight.push(singerHeight)
       }
       // console.log(this.listHeight)
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   },
   components: {
     Scroll

@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
 import VueLazyLoad from 'vue-lazyload'
+import store from './store'
 
 import 'element-ui/packages/theme-chalk/src/index.scss'
 import './common/stylus/index.styl'
@@ -18,6 +19,7 @@ Vue.use(VueLazyLoad, {
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  store,
   router,
   components: { App },
   template: '<App/>'
