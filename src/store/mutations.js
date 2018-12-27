@@ -6,6 +6,9 @@ const mutations = {
   },
   [types.SET_PLAYLIST](state, list) {
     state.playlist = list
+  },
+  [types.SET_CURRENTSONG](state, song) {
+    state.currentSong = song
   }
 }
 

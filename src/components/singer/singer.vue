@@ -53,7 +53,8 @@ export default {
     posY(newVal) {
       if (newVal >= 0) {
         this.currentIndex = 0
-      } else {
+      }
+      if (newVal < 0) {
         for (let i = 0; i < this.listHeight.length - 1; i++) {
           if (-newVal > this.listHeight[i] && -newVal < this.listHeight[i + 1]) {
             this.currentIndex = i

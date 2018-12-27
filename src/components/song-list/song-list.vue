@@ -7,7 +7,7 @@
     </div>
     <scroll :data="songs" class="songs">
         <ul v-show="songs.length > 0">
-          <li v-for="(song, index) in songs" :key="index" class="song">
+          <li v-for="(song, index) in songs" :key="index" class="song" @click="selectItem(song)">
             {{song.name}}
           </li>
         </ul>
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapGetters, mapMutations} from 'vuex'
 import {getSongBySinger} from '../../api/singer'
 import Song from '../../common/js/song'
 import Loading from '../../base/loading/loading'
@@ -38,6 +38,9 @@ export default {
     back() {
       this.$router.back()
     },
+    selectItem(song) {
+      this.setCurrentSong(song)
+    },
     _getSongBySinger() {
       if (!this.singer.id) {
         this.$router.back()
@@ -53,13 +56,18 @@ export default {
     _normalizeSongs(list) {
       list.forEach((l) => {
         this.songs.push(new Song({
-          id: l.al.id,
+          id: l.id,
           name: l.name,
           artist: this.singer.name
         }))
       })
+      this.setPlaylist(this.songs)
       console.log(this.songs)
-    }
+    },
+    ...mapMutations({
+      setPlaylist: 'SET_PLAYLIST',
+      setCurrentSong: 'SET_CURRENTSONG'
+    })
   },
   computed: {
     ...mapGetters([

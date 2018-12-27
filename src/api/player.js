@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-export function getSinger() {
+export function getSongUrl(id) {
   let promise = new Promise((resolve, reject) => {
-    axios.get('/api' + 'top/artists?limit=100').then((res) => {
+    axios.get('/api' + `song/url?id=${id}`).then((res) => {
       resolve(res)
     }).catch(err => {
       reject(err)
@@ -11,10 +11,9 @@ export function getSinger() {
   return promise
 }
 
-export function getSongBySinger(id) {
+export function getSongDuration(id) {
   let promise = new Promise((resolve, reject) => {
-    axios.get('/api' + `artists?id=${id}`).then((res) => {
-      console.log(res)
+    axios.get('/api' + `song/detail?ids=${id}`).then((res) => {
       resolve(res)
     }).catch(err => {
       reject(err)
