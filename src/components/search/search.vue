@@ -14,16 +14,17 @@
     <loading v-show="!songs.length && searchValue"></loading>
     <scroll :data="songs" class="songs" v-show="songs.length">
       <ul>
-        <li class="song">
+        <li class="song" @click="selectSinger">
           <i class="el-icon-star-off"></i>
           {{singer.name}}
         </li>
-        <li class="song" v-for="(song,index) in songs" :key="index">
+        <li class="song" v-for="(song,index) in songs" :key="index" @click="selectItem(index)">
           <i class="el-icon-service"></i>
           {{song.name}}-{{song.artist}}
         </li>
       </ul>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -33,6 +34,7 @@ import Song from '../../common/js/song'
 import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
 import Loading from '../../base/loading/loading'
+import {mapMutations} from 'vuex'
 
 export default {
   data() {
@@ -53,6 +55,15 @@ export default {
     selectHot(hot) {
       this.searchValue = hot
     },
+    selectSinger() {
+      this.setSinger(this.singer)
+      this.$router.push(`/search/${this.singer.name}`)
+    },
+    selectItem(index) {
+      this.setSinger(this.singer)
+      this.setCurrentSong(this.songs[index])
+      this.setPlaylist(this.songs)
+    },
     _getHot() {
       getHot().then((res) => {
         if (res.data.code === 200) {
@@ -62,7 +73,12 @@ export default {
           })
         }
       })
-    }
+    },
+    ...mapMutations({
+      'setSinger': 'SET_SINGER',
+      'setCurrentSong': 'SET_CURRENTSONG',
+      'setPlaylist': 'SET_PLAYLIST'
+    })
   },
   watch: {
     searchValue(newVal) {
@@ -125,7 +141,7 @@ export default {
       color $color-text
       width 80%
   .hot
-    margin-top 20px
+    margin 20px 5px 5px 5px
     .title
       font-size $font-size-medium
       color $color-theme
@@ -143,4 +159,5 @@ export default {
     .song
       line-height 20px
       font-size $font-size-min
+      color $color-border
 </style>
