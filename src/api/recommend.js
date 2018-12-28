@@ -23,3 +23,14 @@ export function getPersonalized() {
 
   return promise
 }
+
+export function getDetail(id) {
+  let promise = new Promise((resolve, reject) => {
+    axios.get('/api' + `playlist/detail?id=${id}`).then((res) => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+  return promise
+}

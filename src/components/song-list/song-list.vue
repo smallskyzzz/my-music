@@ -4,9 +4,10 @@
     <i class="el-icon-back" @click="back"></i>
     <div class="image">
       <img width="100%" height="300" :src="singer.image">
+      <button class="btn" @click="playAll">播放全部</button>
     </div>
     <scroll :data="songs" class="songs">
-        <ul v-show="songs.length > 0">
+        <ul v-show="songs.length > 0" ref="songs">
           <li v-for="(song, index) in songs" :key="index" class="song" @click="selectItem(song)">
             {{song.name}}
           </li>
@@ -24,15 +25,28 @@ import Loading from '../../base/loading/loading'
 import Scroll from '../../base/scroll/scroll'
 
 export default {
+  props: {
+    parent: {
+      type: String,
+      default: 'singer'
+    }
+  },
   data() {
     return {
       songs: [] // 歌曲列表
     }
   },
   created() {
-    setTimeout(() => {
-      this._getSongBySinger()
-    }, 20)
+    if (this.parent === 'singer') {
+      setTimeout(() => {
+        this._getSongBySinger()
+      }, 20)
+    }
+    if (this.parent === 'rank' || this.parent === 'recommend') {
+      setTimeout(() => {
+        this.songs = this.playlist
+      })
+    }
   },
   methods: {
     back() {
@@ -40,6 +54,10 @@ export default {
     },
     selectItem(song) {
       this.setCurrentSong(song)
+    },
+    playAll() {
+      console.log(this.$refs.songs.children[0])
+      this.selectItem(this.songs[0])
     },
     _getSongBySinger() {
       if (!this.singer.id) {
@@ -71,7 +89,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'singer'
+      'singer',
+      'playlist'
     ])
   },
   components: {
@@ -95,8 +114,21 @@ export default {
     position absolute
     top 10px
     left 10px
+    z-index 100000
   .image
+    position relative
     height 300px
+    .btn
+      position absolute
+      left 50%
+      bottom 10px
+      margin 0 0 0 -35px
+      border 0
+      border-radius 20px
+      width 70px
+      text-align center
+      background $color-theme
+      color $color-text
   .songs
     position absolute
     top 300px

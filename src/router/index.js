@@ -17,11 +17,23 @@ export default new Router({
     },
     {
       path: '/recommend',
-      component: recommend
+      component: recommend,
+      children: [
+        {
+          path: ':id',
+          component: SongList
+        }
+      ]
     },
     {
       path: '/rank',
-      component: rank
+      component: rank,
+      children: [
+        {
+          path: ':id',
+          component: SongList
+        }
+      ]
     },
     {
       path: '/singer',

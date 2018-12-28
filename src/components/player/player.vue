@@ -150,6 +150,7 @@ export default {
     position relative
     line-height 30px
     .title
+      white-space nowrap
       color $color-theme
     .icon
       float right

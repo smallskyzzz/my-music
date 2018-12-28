@@ -1,25 +1,33 @@
 <template>
-  <scroll class="recommend" :data="arrs">
-    <div>
-      <slider class="slider">
-        <div v-for="(item, index) in banners" :key="index" class="item">
-          <img width="100%" :src="item.imageUrl"/>
-        </div>
-      </slider>
-      <h1 class="title">推荐歌单</h1>
-      <div class="personalized">
-        <div class="item" v-for="(item, index) in personalized" :key="index">
-          <img width="100%" v-lazy="item.picUrl"/>
+  <div>
+    <scroll class="recommend" :data="arrs">
+      <div>
+        <slider class="slider">
+          <div v-for="(item, index) in banners" :key="index" class="item">
+            <img width="100%" :src="item.imageUrl"/>
+          </div>
+        </slider>
+        <h1 class="title">推荐歌单</h1>
+        <div class="personalized">
+          <div class="item" v-for="(item, index) in personalized" :key="index" @click="selectItem(item)">
+            <span class="count"><i class="el-icon-service"></i>{{(item.playCount / 10000).toFixed(1)}}万</span>
+            <img width="100%" v-lazy="item.picUrl"/>
+            <p class="name">{{item.name}}</p>
+          </div>
         </div>
       </div>
-    </div>
-  </scroll>
+    </scroll>
+    <router-view parent="recommend"></router-view>
+  </div>
 </template>
 
 <script>
-import {getBanner, getPersonalized} from '../../api/recommend'
+import {getBanner, getPersonalized, getDetail} from '../../api/recommend'
 import Slider from '../../base/slider/slider'
 import Scroll from '../../base/scroll/scroll'
+import {mapMutations} from 'vuex'
+import Song from '../../common/js/song'
+import Singer from '../../common/js/singer'
 
 export default {
   data() {
@@ -38,6 +46,27 @@ export default {
     this._getPersonalized()
   },
   methods: {
+    selectItem(item) {
+      getDetail(item.id).then((res) => {
+        this.setSinger(new Singer({
+          id: 0,
+          image: item.picUrl
+        }))
+        this.setPlaylist(this._normalizeSong(res.data.playlist))
+        this.$router.push(`/recommend/${item.id}`)
+      })
+    },
+    _normalizeSong(list) {
+      let ret = []
+      list.tracks.forEach((track) => {
+        ret.push(new Song({
+          id: track.id,
+          artist: track.ar[0].name,
+          name: track.name
+        }))
+      })
+      return ret
+    },
     _getBanner() {
       getBanner().then((res) => {
         if (res.data.code === 200) {
@@ -51,7 +80,12 @@ export default {
           this.personalized = res.data.result
         }
       })
-    }
+    },
+    ...mapMutations({
+      'setSinger': 'SET_SINGER',
+      'setPlaylist': 'SET_PLAYLIST',
+      'setCurrentSong': 'SET_CURRENTSONG'
+    })
   },
   components: {
     Slider,
@@ -83,7 +117,21 @@ export default {
       margin 0 5px
       .item
         display inline-block
+        position relative
         box-sizing border-box
         width 33.3%
         padding 5px
+        .count
+          position absolute
+          top 7px
+          right 7px
+          font-size $font-size-min
+          color $color-text
+        .name
+          width 100%
+          white-space nowrap
+          overflow hidden
+          text-overflow ellipsis
+          color $color-border
+          font-size $font-size-min
 </style>
