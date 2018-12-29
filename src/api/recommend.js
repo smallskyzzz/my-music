@@ -1,5 +1,5 @@
 import axios from 'axios'
-export function getBanner() {
+function getBanner() {
   let promise = new Promise((resolve, reject) => {
     axios.get('/api' + 'banner').then((res) => {
       resolve(res)
@@ -11,7 +11,7 @@ export function getBanner() {
   return promise
 }
 
-export function getPersonalized() {
+function getPersonalized() {
   let promise = new Promise((resolve, reject) => {
     axios.get('/api' + 'personalized').then((res) => {
       console.log(res)
@@ -22,6 +22,11 @@ export function getPersonalized() {
   })
 
   return promise
+}
+
+export function getRecommend() {
+  console.log(4)
+  return Promise.all([getBanner(), getPersonalized()])
 }
 
 export function getDetail(id) {

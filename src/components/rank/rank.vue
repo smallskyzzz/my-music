@@ -34,7 +34,9 @@ export default {
     }
   },
   created() {
-    this._getRanks()
+    setTimeout(() => {
+      this._getRanks()
+    }, 20)
   },
   methods: {
     selectItem(rank) {
