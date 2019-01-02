@@ -38,31 +38,45 @@ export default {
       singers: [], // 处理好的数据结构
       singerList: [], // 歌手一维数组
       listHeight: [], // 计算每个shortcut的height
-      currentIndex: 0, // 当前shortcut的index
+      // currentIndex: 0, // 当前shortcut的index
       posY: 0 // 当前滚动的y值
     }
   },
   created() {
     this._getSinger()
     // console.log(pinyin('a'))
-    setTimeout(() => {
-      this._calculateHeight() // 计算每个shortcut对应的高度
-    }, 20)
   },
-  watch: {
-    posY(newVal) {
-      if (newVal >= 0) {
-        this.currentIndex = 0
-      }
-      if (newVal < 0) {
+  computed: {
+    currentIndex() {
+      if (this.posY >= 0) {
+        // console.log(0)
+        return 0
+      } else {
+        // console.log(this.posY)
+        // console.log(this.listHeight)
         for (let i = 0; i < this.listHeight.length - 1; i++) {
-          if (-newVal > this.listHeight[i] && -newVal < this.listHeight[i + 1]) {
-            this.currentIndex = i
+          if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
+            // console.log(i)
+            return i
           }
         }
       }
     }
   },
+  // watch: {
+  //   posY(newVal) {
+  //     if (newVal >= 0) {
+  //       this.currentIndex = 0
+  //     }
+  //     if (newVal < 0) {
+  //       for (let i = 0; i < this.listHeight.length - 1; i++) {
+  //         if (-newVal > this.listHeight[i] && -newVal < this.listHeight[i + 1]) {
+  //           this.currentIndex = i
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
     scrollY(posY) {
       // if (posY >= 0) {
@@ -103,6 +117,9 @@ export default {
             this.singerList = arr.concat(this.singers[i].singers) // 此处经过循环渠道所有的singer
             arr = this.singerList
           }
+          setTimeout(() => {
+            this._calculateHeight() // 计算每个shortcut对应的高度
+          }, 20)
           console.log(this.singers)
         }
       })

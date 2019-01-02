@@ -15,9 +15,9 @@ export default {
     }
   },
   created() {
-    setTimeout(() => {
+    this.$nextTick(() => {
       this._initScroll()
-    }, 20)
+    })
   },
   methods: {
     refresh() {
