@@ -1,6 +1,6 @@
 <template>
   <div>
-    <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList">
+    <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList" v-show="singerList.length">
       <div>
         <ul>
           <li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem" @click="selectItem(singer)">
@@ -19,6 +19,7 @@
         </ul>
       </div>
     </scroll>
+    <loading v-show="!singerList.length"></loading>
     <router-view></router-view>
   </div>
 </template>
@@ -28,41 +29,58 @@ import {getSinger} from '../../api/singer'
 import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
+import {playerMixin} from '../../common/js/mixin'
+import Loading from '../../base/loading/loading'
 
 const pinyin = require('pinyin')
 const HEIGHT = 60 // 每个li的高度
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       singers: [], // 处理好的数据结构
       singerList: [], // 歌手一维数组
       listHeight: [], // 计算每个shortcut的height
-      currentIndex: 0, // 当前shortcut的index
+      // currentIndex: 0, // 当前shortcut的index
       posY: 0 // 当前滚动的y值
     }
   },
   created() {
     this._getSinger()
     // console.log(pinyin('a'))
-    setTimeout(() => {
-      this._calculateHeight() // 计算每个shortcut对应的高度
-    }, 20)
   },
-  watch: {
-    posY(newVal) {
-      if (newVal >= 0) {
-        this.currentIndex = 0
-      }
-      if (newVal < 0) {
+  computed: {
+    currentIndex() {
+      if (this.posY >= 0) {
+        // console.log(0)
+        return 0
+      } else {
+        // console.log(this.posY)
+        // console.log(this.listHeight)
         for (let i = 0; i < this.listHeight.length - 1; i++) {
-          if (-newVal > this.listHeight[i] && -newVal < this.listHeight[i + 1]) {
-            this.currentIndex = i
+          if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
+            // console.log(i)
+            return i
           }
         }
       }
     }
   },
+  // watch: {
+  //   posY(newVal) {
+  //     if (newVal >= 0) {
+  //       this.currentIndex = 0
+  //     }
+  //     if (newVal < 0) {
+  //       for (let i = 0; i < this.listHeight.length - 1; i++) {
+  //         if (-newVal > this.listHeight[i] && -newVal < this.listHeight[i + 1]) {
+  //           this.currentIndex = i
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
     scrollY(posY) {
       // if (posY >= 0) {
@@ -92,6 +110,11 @@ export default {
       })
       this.setSinger(singer)
     },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.singer.$el.style.bottom = bottom
+      this.$refs.singer.refresh()
+    },
     _getSinger() {
       getSinger().then((res) => {
         if (res.data.code === 200) {
@@ -103,6 +126,9 @@ export default {
             this.singerList = arr.concat(this.singers[i].singers) // 此处经过循环渠道所有的singer
             arr = this.singerList
           }
+          setTimeout(() => {
+            this._calculateHeight() // 计算每个shortcut对应的高度
+          }, 20)
           console.log(this.singers)
         }
       })
@@ -159,7 +185,8 @@ export default {
     })
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>

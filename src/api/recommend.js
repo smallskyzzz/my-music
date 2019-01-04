@@ -1,5 +1,5 @@
 import axios from 'axios'
-export function getBanner() {
+function getBanner() {
   let promise = new Promise((resolve, reject) => {
     axios.get('/api' + '/banner').then((res) => { // 当部署到阿里云上时间，需要用下面的ip
     // axios.get('http://149.129.68.90:3000' + '/banner').then((res) => {
@@ -12,7 +12,7 @@ export function getBanner() {
   return promise
 }
 
-export function getPersonalized() {
+function getPersonalized() {
   let promise = new Promise((resolve, reject) => {
     axios.get('/api' + '/personalized').then((res) => {
     // axios.get('http://149.129.68.90:3000' + '/personalized').then((res) => {
@@ -24,6 +24,11 @@ export function getPersonalized() {
   })
 
   return promise
+}
+
+export function getRecommend() {
+  console.log(4)
+  return Promise.all([getBanner(), getPersonalized()])
 }
 
 export function getDetail(id) {

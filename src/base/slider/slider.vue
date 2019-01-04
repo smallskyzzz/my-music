@@ -1,53 +1,57 @@
 <template>
-  <div class="slider" ref="slider">
-    <div class="slider-group" ref="sliderGroup">
-      <slot></slot>
+    <div class="slider" ref="slider">
+      <div class="slider-group" ref="sliderGroup">
+        <slot></slot>
+      </div>
+      <div class="dots">
+        <span class="dot" v-for="(item,index) in dots" :key="index" :class="{active:currentPageIndex === index}"></span>
+      </div>
     </div>
-    <div class="dots">
-      <span class="dot" v-for="(item, index) in dots" :class="{active:currentPageIndex === index}" :key="index"></span>
-    </div>
-  </div>
 </template>
 
 <script>
 import BScroll from 'better-scroll'
-import {addClass} from '../../common/js/dom'
-
+import {addClass} from '../../common/js/dom.js'
 export default {
   data() {
     return {
-      dots: [], // 个数
-      currentPageIndex: 0 // 当前页
+      dots: [],
+      currentPageIndex: 0
     }
   },
   props: {
-    loop: { // 是否循环
+    loop: {// 是否循环
       type: Boolean,
       default: true
     },
-    autoPlay: { // 是否自动播放
+    autoPlay: {
       type: Boolean,
       default: true
     },
-    interval: { // 刷新间隔
+    interval: {
       type: Number,
       default: 4000
     }
   },
-  mounted() { // 挂载完成，也就是模板中的html渲染到了html页面中，此时一般可以做一些ajax操作，mounted只会执行一次
+  mounted() {
     setTimeout(() => {
       this._setSliderWidth()
       this._initDots()
       this._initSlider()
-    }, 20)
+    }, 20)// 此处浏览器刷新时间为17ms，20ms为一个经验值（也可用this.$nextTick）
+    // this.$nextTick(() => {
+    //   this._setSliderWidth()
+    //   this._initDots()
+    //   this._initSlider()
+    // })
     if (this.autoPlay) {
       this._play()
     }
-    window.addEventListener('resize', () => { // 坚挺resize事件，保证resize后还能正常滚动
+    window.addEventListener('resize', () => { // 监听浏览器改变事件，不然改变了必须重新刷新才能看到正确的图片切换
       if (!this.slider) {
         return 0
       } else {
-        this._setSliderWidth(true) // 加入参数是防止再次加上两个宽度(better-scroll轮播图滚动时需要前后加两个空的图片div)
+        this._setSliderWidth(true)
         this.slider.refresh()
       }
     })
@@ -64,12 +68,12 @@ export default {
         width += sliderWidth
       }
       if (this.loop && !isResize) {
-        width += 2 * sliderWidth
+        width += 2 * sliderWidth// 加两个 保证前后两张图片的效果
       }
       this.$refs.sliderGroup.style.width = width + 'px'
     },
     _initDots() {
-      this.dots = this.children.length
+      this.dots = new Array(this.children.length)
     },
     _initSlider() {
       this.slider = new BScroll(this.$refs.slider, {
@@ -77,14 +81,18 @@ export default {
         scrollY: false,
         momentum: false,
         snap: {
-          loop: this.loop,
+          loop: this.loop, // 循环
           threshold: 0.3,
-          speed: 400
-        },
-        click: true
+          speed: 400 // 速度
+        }
+        // click: true
       })
-      this.slider.on('scrollEnd', () => {
+      this.slider.on('scrollEnd', () => { // 封装的事件，能监听到滚动结束，并且可以获取到当前页面的index
         let pageIndex = this.slider.getCurrentPage().pageX
+        // if (this.loop) {
+        //   pageIndex -= 1
+        // }// 貌似该组件更新了，此处不需要减1
+        // console.log(pageIndex)
         this.currentPageIndex = pageIndex
         if (this.autoPlay) {
           clearTimeout(this.timer)
@@ -92,9 +100,11 @@ export default {
         }
       })
     },
-    _play() {
+    _play () {
+      // let pageIndex = this.currentPageIndex + 1
       this.timer = setTimeout(() => {
-        this.slider.next()
+        // this.slider.goToPage(pageIndex, 0, 400)// 封装的方法
+        this.slider.next() // 直接跳转到下一页，解决最后一页无法跳转bug
       }, this.interval)
     }
   },
@@ -104,7 +114,7 @@ export default {
 }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style scoped lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   .slider
     min-height 1px
@@ -132,16 +142,15 @@ export default {
       bottom 12px
       text-align center
       font-size 0
-      z-index 1000
       .dot
-        display inline-block
-        margin 0 4px
-        width 8px
-        height 8px
-        border-radius 50%
-        background $color-text
+        display: inline-block
+        margin: 0 4px
+        width: 8px
+        height: 8px
+        border-radius: 50%
+        background: $color-background
         &.active
-          width 20px
-          border-radius 5px
-          background $color-theme
+          width: 20px
+          border-radius: 5px
+          background: $color-theme
 </style>

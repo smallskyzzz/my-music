@@ -1,12 +1,14 @@
 <template>
   <div>
-    <scroll class="recommend" :data="arrs">
+    <scroll class="recommend" :data="arrs" ref="scroll" v-show="arrs.length">
       <div>
-        <slider class="slider">
-          <div v-for="(item, index) in banners" :key="index" class="item">
-            <img width="100%" :src="item.imageUrl"/>
-          </div>
-        </slider>
+        <div class="slider-wrapper" v-if="banners.length"> <!--加上v-if判断有值时再渲染-->
+          <slider class="slider">
+            <div v-for="(item, index) in banners" :key="index">
+              <img width="100%" :src="item.imageUrl"/>
+            </div>
+          </slider>
+        </div>
         <h1 class="title">推荐歌单</h1>
         <div class="personalized">
           <div class="item" v-for="(item, index) in personalized" :key="index" @click="selectItem(item)">
@@ -17,19 +19,23 @@
         </div>
       </div>
     </scroll>
+    <loading v-show="!arrs.length"></loading>
     <router-view parent="recommend"></router-view>
   </div>
 </template>
 
 <script>
-import {getBanner, getPersonalized, getDetail} from '../../api/recommend'
+import {getRecommend, getDetail} from '../../api/recommend'
 import Slider from '../../base/slider/slider'
 import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
 import Song from '../../common/js/song'
 import Singer from '../../common/js/singer'
+import {playerMixin} from '../../common/js/mixin'
+import Loading from '../../base/loading/loading'
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       banners: [], // 轮播
@@ -42,8 +48,11 @@ export default {
     }
   },
   created() {
-    this._getBanner()
-    this._getPersonalized()
+    this._getRecommend() // 此处加上延时后就会导致banners图片出现问题（从其他页面跳转过来也会出现该问题）
+    // this._getPersonalized()
+  },
+  mounted() {
+    // this.$refs.sliderItem.style.width = '100%'
   },
   methods: {
     selectItem(item) {
@@ -56,6 +65,11 @@ export default {
         this.$router.push(`/recommend/${item.id}`)
       })
     },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.scroll.$el.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
     _normalizeSong(list) {
       let ret = []
       list.tracks.forEach((track) => {
@@ -67,20 +81,23 @@ export default {
       })
       return ret
     },
-    _getBanner() {
-      getBanner().then((res) => {
-        if (res.data.code === 200) {
-          this.banners = res.data.banners
+    _getRecommend() {
+      getRecommend().then((res) => {
+        if (res[0].data.code === 200) {
+          this.banners = res[0].data.banners
+        }
+        if (res[1].data.code === 200) {
+          this.personalized = res[1].data.result
         }
       })
     },
-    _getPersonalized() {
-      getPersonalized().then((res) => {
-        if (res.data.code === 200) {
-          this.personalized = res.data.result
-        }
-      })
-    },
+    // _getPersonalized() {
+    //   getPersonalized().then((res) => {
+    //     if (res.data.code === 200) {
+    //       this.personalized = res.data.result
+    //     }
+    //   })
+    // },
     ...mapMutations({
       'setSinger': 'SET_SINGER',
       'setPlaylist': 'SET_PLAYLIST',
@@ -89,12 +106,13 @@ export default {
   },
   components: {
     Slider,
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style scoped lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
   .recommend
     position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
@@ -102,12 +120,10 @@ export default {
     width 100%
     top 40px
     bottom 0
-    .slider
+    .slider-wrapper
       position relative
       width 100%
       overflow hidden
-      .item
-        width 100%
     .title
       line-height 30px
       text-align center
