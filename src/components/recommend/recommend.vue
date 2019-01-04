@@ -1,6 +1,6 @@
 <template>
   <div>
-    <scroll class="recommend" :data="arrs">
+    <scroll class="recommend" :data="arrs" ref="scroll" v-show="arrs.length">
       <div>
         <div class="slider-wrapper" v-if="banners.length"> <!--加上v-if判断有值时再渲染-->
           <slider class="slider">
@@ -19,6 +19,7 @@
         </div>
       </div>
     </scroll>
+    <loading v-show="!arrs.length"></loading>
     <router-view parent="recommend"></router-view>
   </div>
 </template>
@@ -30,8 +31,11 @@ import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
 import Song from '../../common/js/song'
 import Singer from '../../common/js/singer'
+import {playerMixin} from '../../common/js/mixin'
+import Loading from '../../base/loading/loading'
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       banners: [], // 轮播
@@ -60,6 +64,11 @@ export default {
         this.setPlaylist(this._normalizeSong(res.data.playlist))
         this.$router.push(`/recommend/${item.id}`)
       })
+    },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.scroll.$el.style.bottom = bottom
+      this.$refs.scroll.refresh()
     },
     _normalizeSong(list) {
       let ret = []
@@ -97,7 +106,8 @@ export default {
   },
   components: {
     Slider,
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>

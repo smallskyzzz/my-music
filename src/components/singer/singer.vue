@@ -1,6 +1,6 @@
 <template>
   <div>
-    <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList">
+    <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList" v-show="singerList.length">
       <div>
         <ul>
           <li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem" @click="selectItem(singer)">
@@ -19,6 +19,7 @@
         </ul>
       </div>
     </scroll>
+    <loading v-show="!singerList.length"></loading>
     <router-view></router-view>
   </div>
 </template>
@@ -28,11 +29,14 @@ import {getSinger} from '../../api/singer'
 import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
+import {playerMixin} from '../../common/js/mixin'
+import Loading from '../../base/loading/loading'
 
 const pinyin = require('pinyin')
 const HEIGHT = 60 // 每个li的高度
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       singers: [], // 处理好的数据结构
@@ -106,6 +110,11 @@ export default {
       })
       this.setSinger(singer)
     },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.singer.$el.style.bottom = bottom
+      this.$refs.singer.refresh()
+    },
     _getSinger() {
       getSinger().then((res) => {
         if (res.data.code === 200) {
@@ -176,7 +185,8 @@ export default {
     })
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>

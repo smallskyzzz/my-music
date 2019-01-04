@@ -1,6 +1,6 @@
 <template>
   <div>
-    <scroll :data="ranks" class="rank">
+    <scroll :data="ranks" class="rank" ref="rank" v-show="ranks.length">
       <ul>
         <li v-for="(rank, index) in ranks" :key="index" class="item" @click="selectItem(rank)">
           <div class="image">
@@ -16,6 +16,7 @@
         </li>
       </ul>
     </scroll>
+    <loading v-show="!ranks.length"></loading>
     <router-view parent="rank"></router-view>
   </div>
 </template>
@@ -26,8 +27,11 @@ import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
 import Singer from '../../common/js/singer'
 import Song from '../../common/js/song'
+import {playerMixin} from '../../common/js/mixin'
+import Loading from '../../base/loading/loading'
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       ranks: []
@@ -46,6 +50,11 @@ export default {
       }))
       this.setPlaylist(this._normalizeSong(rank))
       this.$router.push(`/rank/${rank.id}`)
+    },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.rank.$el.style.bottom = bottom
+      this.$refs.rank.refresh()
     },
     _normalizeSong(rank) {
       let ret = []
@@ -76,7 +85,8 @@ export default {
     })
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>

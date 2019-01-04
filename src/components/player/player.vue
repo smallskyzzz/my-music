@@ -3,9 +3,9 @@
     <div class="content">
       <span class="title">当前播放:{{currentSong.name}}</span>
       <div class="icon">
-        <i class="el-icon-arrow-left" @click="prev"></i>
-        <i :class="isPlaying" @click="togglePlay"></i>
-        <i class="el-icon-arrow-right" @click="next"></i>
+        <i class="el-icon-arrow-left icon-item" @click="prev"></i>
+        <i :class="isPlaying" class="icon-item" @click="togglePlay"></i>
+        <i class="el-icon-arrow-right icon-item" @click="next"></i>
       </div>
     </div>
     <div class="slider">
@@ -146,15 +146,20 @@ export default {
   right 0
   height 60px
   background black
+  z-index 100
   .content
     position relative
     line-height 30px
     .title
       white-space nowrap
       color $color-theme
+      font-size $font-size-medium
     .icon
       float right
       font-size 25px
+      .icon-item
+        background $color-theme
+        border-radius 50%
   .slider
     width 100%
     height 30px

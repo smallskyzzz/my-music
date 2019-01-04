@@ -11,8 +11,9 @@
         <span class="item" v-for="(hot,index) in hotList" :key="index" @click="selectHot(hot)">{{hot}}</span>
       </div>
     </div>
-    <loading v-show="!songs.length && searchValue"></loading>
-    <scroll :data="songs" class="songs" v-show="songs.length">
+    <loading v-show="!songs.length && searchValue && albumCount"></loading>
+    <no-result v-show="!songs.length && searchValue && !albumCount"></no-result>
+    <scroll :data="songs" class="songs" v-show="songs.length" ref="songs">
       <ul>
         <li class="song" @click="selectSinger">
           <i class="el-icon-star-off"></i>
@@ -34,15 +35,19 @@ import Song from '../../common/js/song'
 import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
 import Loading from '../../base/loading/loading'
+import NoResult from '../../base/no-result/no-result'
 import {mapMutations} from 'vuex'
+import {playerMixin} from '../../common/js/mixin'
 
 export default {
+  mixins: [playerMixin],
   data() {
     return {
       searchValue: '', // 输入框内的值
       hotList: [], // 热门搜索列表
       songs: [], // 歌曲列表
-      singer: {} // 当前搜索中包含的歌手（固定一个）
+      singer: {}, // 当前搜索中包含的歌手（固定一个）
+      albumCount: 1 // 判断搜索结果为空还是正在加载中
     }
   },
   created() {
@@ -63,6 +68,11 @@ export default {
       this.setSinger(this.singer)
       this.setCurrentSong(this.songs[index])
       this.setPlaylist(this.songs)
+    },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.songs.$el.style.bottom = bottom
+      this.$refs.songs.refresh()
     },
     _getHot() {
       getHot().then((res) => {
@@ -86,25 +96,34 @@ export default {
         search(newVal).then((res) => { // res为数组，第一项为歌手，第二项为歌曲
           console.log(res)
           if (res[0].data.code === 200) {
-            this.singer = new Singer({
-              id: res[0].data.result.albums[0].artist.id,
-              name: res[0].data.result.albums[0].artist.name,
-              image: res[0].data.result.albums[0].artist.picUrl
-            })
-            console.log(this.singer)
+            if (res[0].data.result.albumCount !== 0) {
+              this.singer = new Singer({
+                id: res[0].data.result.albums[0].artist.id,
+                name: res[0].data.result.albums[0].artist.name,
+                image: res[0].data.result.albums[0].artist.picUrl
+              })
+              console.log(this.singer)
+            }
+          } else {
+            this.singer = {}
           }
           if (res[1].data.code === 200) {
-            res[1].data.result.songs.forEach((song) => {
-              let artist = ''
-              song.artists.forEach((ar) => {
-                artist += ar.name + ' '
+            if (res[0].data.result.albumCount !== 0) {
+              res[1].data.result.songs.forEach((song) => {
+                let artist = ''
+                song.artists.forEach((ar) => {
+                  artist += ar.name + ' '
+                })
+                this.songs.push(new Song({
+                  id: song.id,
+                  name: song.name,
+                  artist: artist
+                }))
               })
-              this.songs.push(new Song({
-                id: song.id,
-                name: song.name,
-                artist: artist
-              }))
-            })
+            } else {
+              this.songs = []
+              this.albumCount = 0
+            }
           }
           console.log(this.songs)
         })
@@ -115,7 +134,8 @@ export default {
   },
   components: {
     Scroll,
-    Loading
+    Loading,
+    NoResult
   }
 }
 </script>

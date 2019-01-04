@@ -6,7 +6,7 @@
       <img width="100%" height="300" :src="singer.image">
       <button class="btn" @click="playAll">播放全部</button>
     </div>
-    <scroll :data="songs" class="songs">
+    <scroll :data="songs" class="songs" ref="songs">
         <ul v-show="songs.length > 0" ref="songs">
           <li v-for="(song, index) in songs" :key="index" class="song" @click="selectItem(song)">
             {{song.name}}
@@ -23,8 +23,10 @@ import {getSongBySinger} from '../../api/singer'
 import Song from '../../common/js/song'
 import Loading from '../../base/loading/loading'
 import Scroll from '../../base/scroll/scroll'
+import {playerMixin} from '../../common/js/mixin'
 
 export default {
+  mixins: [playerMixin],
   props: {
     parent: {
       type: String,
@@ -58,6 +60,11 @@ export default {
     playAll() {
       console.log(this.$refs.songs.children[0])
       this.selectItem(this.songs[0])
+    },
+    handlePlayer(currentSong) {
+      const bottom = currentSong.name ? '60px' : 0
+      this.$refs.songs.$el.style.bottom = bottom
+      this.$refs.songs.refresh()
     },
     _getSongBySinger() {
       if (!this.singer.id) {
