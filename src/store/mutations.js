@@ -9,6 +9,9 @@ const mutations = {
   },
   [types.SET_CURRENTSONG](state, song) {
     state.currentSong = song
+  },
+  [types.SET_SEARCHHISTORY](state, history) {
+    state.searchHistory = history
   }
 }
 

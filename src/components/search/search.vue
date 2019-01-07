@@ -1,6 +1,7 @@
 <template>
   <div class="search">
-    <div class="input">
+    <loading v-show="!hotList.length"></loading>
+    <div class="input" v-show="hotList.length">
       <i class="el-icon-search"></i>
       <input class="text" type="text" v-model="searchValue">
       <i class="el-icon-close" v-show="searchValue" @click="clear"></i>
@@ -10,6 +11,17 @@
       <div class="hot-item">
         <span class="item" v-for="(hot,index) in hotList" :key="index" @click="selectHot(hot)">{{hot}}</span>
       </div>
+    </div>
+    <div class="history" v-show="!songs.length && !searchValue">
+      <h1 class="title">搜索历史</h1>
+      <ul class="items">
+        <li v-for="(history, index) in searchHistory" :key="index" class="item" @click="selectHistory(history)">
+          <span class="name">{{history}}</span>
+          <span class="icon" @click.stop="deleteHistory(history)">
+            <i class="el-icon-delete"></i>
+          </span>
+        </li>
+      </ul>
     </div>
     <loading v-show="!songs.length && searchValue && albumCount"></loading>
     <no-result v-show="!songs.length && searchValue && !albumCount"></no-result>
@@ -25,6 +37,7 @@
         </li>
       </ul>
     </scroll>
+    <message-box ref="messageBox" @confirm="confirmDelete"></message-box>
     <router-view></router-view>
   </div>
 </template>
@@ -36,8 +49,9 @@ import Singer from '../../common/js/singer'
 import Scroll from '../../base/scroll/scroll'
 import Loading from '../../base/loading/loading'
 import NoResult from '../../base/no-result/no-result'
-import {mapMutations} from 'vuex'
+import {mapMutations, mapActions, mapGetters} from 'vuex'
 import {playerMixin} from '../../common/js/mixin'
+import MessageBox from '../../base/message-box/message-box'
 
 export default {
   mixins: [playerMixin],
@@ -47,7 +61,8 @@ export default {
       hotList: [], // 热门搜索列表
       songs: [], // 歌曲列表
       singer: {}, // 当前搜索中包含的歌手（固定一个）
-      albumCount: 1 // 判断搜索结果为空还是正在加载中
+      albumCount: 1, // 判断搜索结果为空还是正在加载中
+      deleteOne: '' // 需要删除的值
     }
   },
   created() {
@@ -63,16 +78,28 @@ export default {
     selectSinger() {
       this.setSinger(this.singer)
       this.$router.push(`/search/${this.singer.name}`)
+      this._saveSearchHistory()
     },
     selectItem(index) {
       this.setSinger(this.singer)
       this.setCurrentSong(this.songs[index])
       this.setPlaylist(this.songs)
+      this._saveSearchHistory()
     },
     handlePlayer(currentSong) {
       const bottom = currentSong.name ? '60px' : 0
       this.$refs.songs.$el.style.bottom = bottom
       this.$refs.songs.refresh()
+    },
+    selectHistory(history) {
+      this.searchValue = history
+    },
+    deleteHistory(history) {
+      this.deleteOne = history
+      this.$refs.messageBox.show()
+    },
+    confirmDelete() {
+      this.deleteSearchHistory(this.deleteOne)
     },
     _getHot() {
       getHot().then((res) => {
@@ -84,58 +111,78 @@ export default {
         }
       })
     },
+    _saveSearchHistory() {
+      this.saveSearchHistory(this.searchValue)
+    },
     ...mapMutations({
       'setSinger': 'SET_SINGER',
       'setCurrentSong': 'SET_CURRENTSONG',
       'setPlaylist': 'SET_PLAYLIST'
-    })
+    }),
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteSearchHistory'
+    ])
   },
   watch: {
     searchValue(newVal) {
-      if (newVal) {
-        search(newVal).then((res) => { // res为数组，第一项为歌手，第二项为歌曲
-          console.log(res)
-          if (res[0].data.code === 200) {
-            if (res[0].data.result.albumCount !== 0) {
-              this.singer = new Singer({
-                id: res[0].data.result.albums[0].artist.id,
-                name: res[0].data.result.albums[0].artist.name,
-                image: res[0].data.result.albums[0].artist.picUrl
-              })
-              console.log(this.singer)
-            }
-          } else {
-            this.singer = {}
-          }
-          if (res[1].data.code === 200) {
-            if (res[0].data.result.albumCount !== 0) {
-              res[1].data.result.songs.forEach((song) => {
-                let artist = ''
-                song.artists.forEach((ar) => {
-                  artist += ar.name + ' '
-                })
-                this.songs.push(new Song({
-                  id: song.id,
-                  name: song.name,
-                  artist: artist
-                }))
-              })
-            } else {
-              this.songs = []
-              this.albumCount = 0
-            }
-          }
-          console.log(this.songs)
-        })
-      } else {
-        this.songs = []
+      this.albumCount = 1 // 搜索前将其置为1
+      let timer
+      if (timer) { // 节流函数
+        clearTimeout(timer)
       }
+      timer = setTimeout(() => {
+        if (newVal) {
+          search(newVal).then((res) => { // res为数组，第一项为歌手，第二项为歌曲
+            console.log(res)
+            if (res[0].data.code === 200) {
+              if (res[0].data.result.albumCount !== 0) {
+                this.singer = new Singer({
+                  id: res[0].data.result.albums[0].artist.id,
+                  name: res[0].data.result.albums[0].artist.name,
+                  image: res[0].data.result.albums[0].artist.picUrl
+                })
+                console.log(this.singer)
+              }
+            } else {
+              this.singer = {}
+            }
+            if (res[1].data.code === 200) {
+              if (res[0].data.result.albumCount !== 0) {
+                res[1].data.result.songs.forEach((song) => {
+                  let artist = ''
+                  song.artists.forEach((ar) => {
+                    artist += ar.name + ' '
+                  })
+                  this.songs.push(new Song({
+                    id: song.id,
+                    name: song.name,
+                    artist: artist
+                  }))
+                })
+              } else {
+                this.songs = []
+                this.albumCount = 0
+              }
+            }
+            console.log(this.songs)
+          })
+        } else {
+          this.songs = []
+        }
+      }, 200)
     }
+  },
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ])
   },
   components: {
     Scroll,
     Loading,
-    NoResult
+    NoResult,
+    MessageBox
   }
 }
 </script>
@@ -171,6 +218,20 @@ export default {
         margin 0 5px
         font-size $font-size-min
         color $color-border
+  .history
+    margin 10px 5px 5px 5px
+    .title
+      font-size $font-size-medium
+      color $color-theme
+    .items
+      padding-top 10px
+      .item
+        display flex
+        padding 3px
+        font-size $font-size-min
+        color $color-border
+        .name
+          flex 1
   .songs
     position fixed
     top 80px
