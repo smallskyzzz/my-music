@@ -5,3 +5,5 @@ export const playlist = state => state.playlist
 export const currentSong = state => state.currentSong
 
 export const searchHistory = state => state.searchHistory
+
+export const fullScreen = state => state.fullScreen

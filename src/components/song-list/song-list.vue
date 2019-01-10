@@ -39,6 +39,10 @@ export default {
     }
   },
   created() {
+    if (this.songs.length === 0 && this.playlist.length === 0) {
+      this.$router.back()
+      return
+    }
     if (this.parent === 'singer') {
       setTimeout(() => {
         this._getSongBySinger()
@@ -56,6 +60,7 @@ export default {
     },
     selectItem(song) {
       this.setCurrentSong(song)
+      this.setFullScreen(true)
     },
     playAll() {
       console.log(this.$refs.songs.children[0])
@@ -83,7 +88,8 @@ export default {
         this.songs.push(new Song({
           id: l.id,
           name: l.name,
-          artist: this.singer.name
+          artist: this.singer.name,
+          image: l.al.picUrl
         }))
       })
       this.setPlaylist(this.songs)
@@ -91,7 +97,8 @@ export default {
     },
     ...mapMutations({
       setPlaylist: 'SET_PLAYLIST',
-      setCurrentSong: 'SET_CURRENTSONG'
+      setCurrentSong: 'SET_CURRENTSONG',
+      setFullScreen: 'SET_FULLSCREEN'
     })
   },
   computed: {

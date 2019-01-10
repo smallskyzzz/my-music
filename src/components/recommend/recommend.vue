@@ -76,7 +76,8 @@ export default {
         ret.push(new Song({
           id: track.id,
           artist: track.ar[0].name,
-          name: track.name
+          name: track.name,
+          image: track.al.picUrl
         }))
       })
       return ret

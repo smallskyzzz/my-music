@@ -12,6 +12,9 @@ const mutations = {
   },
   [types.SET_SEARCHHISTORY](state, history) {
     state.searchHistory = history
+  },
+  [types.SET_FULLSCREEN](state, flag) {
+    state.fullScreen = flag
   }
 }
 

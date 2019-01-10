@@ -1,25 +1,45 @@
 <template>
-  <div class="player" v-show="currentSong.name && currentSongUrl">
-    <div class="content">
-      <span class="title">当前播放:{{currentSong.name}}</span>
-      <div class="icon">
-        <i class="el-icon-arrow-left icon-item" @click="prev"></i>
-        <i :class="isPlaying" class="icon-item" @click="togglePlay"></i>
-        <i class="el-icon-arrow-right icon-item" @click="next"></i>
+  <div>
+    <div class="player" v-show="currentSong.name && fullScreen">
+    <i class="el-icon-arrow-down back" @click="close"></i>
+    <div class="image-wrapper">
+      <div class="image">
+        <img width="100%" height="100%" :src="currentSong.image || singer.image"/>
       </div>
     </div>
-    <div class="slider">
-      <div class="currentTime time">
-        <span>{{format(currentTime / 1000)}}</span>
+    <div class="control">
+      <div class="control-time">
+        <span class="time">{{format(currentTime / 1000)}}</span>
+        <el-slider class="el-slider" v-model="currentTime" :max="duration" @change="change"></el-slider>
+        <span class="time">{{format(duration / 1000)}}</span>
       </div>
-      <el-slider class="el-slider"  v-model="currentTime" :max="duration" @change="change"></el-slider>
-      <div class="allTime time">
-        <span>{{format(duration / 1000)}}</span>
+      <div class="control-song">
+        <div class="icon">
+          <i class="el-icon-arrow-left" @click="prev"></i>
+          &nbsp;
+          <i :class="isPlaying" @click="togglePlay"></i>
+          &nbsp;
+          <i class="el-icon-arrow-right" @click="next"></i>
+        </div>
       </div>
     </div>
     <audio :src="currentSongUrl" autoplay ref="audio" @timeupdate="updateTime" @ended="end" @pause="pause" @play="play">
       <source :src="currentSongUrl" />
     </audio>
+  </div>
+    <div class="mini-player" v-show="currentSong.name && !fullScreen" @click="open">
+      <div class="image" align="center">
+        <img width="40" height="40" :src="currentSong.image || singer.image">
+      </div>
+      <div class="name">
+        <span>{{currentSong.name}}<br>--{{currentSong.artist}}</span>
+      </div>
+      <div class="icon">
+        <i :class="isPlaying" @click.stop="togglePlay"></i>
+        &nbsp;
+        <i class="el-icon-view"></i>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -36,16 +56,13 @@ export default {
       playing: false // 是否在播放
     }
   },
-  computed: {
-    isPlaying() {
-      return this.playing ? 'el-icon-check' : 'el-icon-caret-right'
-    },
-    ...mapGetters([
-      'currentSong',
-      'playlist'
-    ])
-  },
   methods: {
+    close() {
+      this.setFullScreen(false)
+    },
+    open() {
+      this.setFullScreen(true)
+    },
     format(duration) {
       duration = duration | 0 // 向下取整
       const minute = duration / 60 | 0
@@ -61,17 +78,8 @@ export default {
         this.$refs.audio.play()
       }
     },
-    updateTime(e) {
-      this.currentTime = e.target.currentTime * 1000
-    },
     change(time) {
       this.$refs.audio.currentTime = time / 1000
-    },
-    play() {
-      this.playing = true
-    },
-    pause() {
-      this.playing = false
     },
     prev() {
       let prev = this.playlist.findIndex((item) => {
@@ -95,8 +103,17 @@ export default {
         this.setCurrentSong(this.playlist[0])
       }
     },
+    updateTime(e) {
+      this.currentTime = e.target.currentTime * 1000
+    },
     end() {
       this.next()
+    },
+    play() {
+      this.playing = true
+    },
+    pause() {
+      this.playing = false
     },
     _pad(num, n = 2) {
       let len = num.toString().length
@@ -107,10 +124,9 @@ export default {
       return num
     },
     ...mapMutations({
+      'setFullScreen': 'SET_FULLSCREEN',
       'setCurrentSong': 'SET_CURRENTSONG'
     })
-  },
-  mounted() {
   },
   watch: {
     currentSong(newVal) {
@@ -134,51 +150,95 @@ export default {
         })
       }
     }
-    // currentTime(newVal) {
-    //   // console.log(newVal)
-    // }
+  },
+  computed: {
+    isPlaying() {
+      return this.playing ? 'el-icon-check' : 'el-icon-caret-right'
+    },
+    ...mapGetters([
+      'currentSong',
+      'fullScreen',
+      'playlist',
+      'singer'
+    ])
   }
 }
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-@import "../../common/stylus/variable"
-.player
-  position fixed
-  bottom 0
-  left 0
-  right 0
-  height 60px
-  background black
-  z-index 100
-  .content
-    position relative
-    line-height 30px
-    .title
-      white-space nowrap
-      color $color-theme
-      font-size $font-size-medium
-    .icon
-      float right
-      font-size 25px
-      .icon-item
-        background $color-theme
-        border-radius 50%
-  .slider
-    width 100%
-    height 30px
-    .time
-      display inline-block
-      line-height 30px
-      width 10%
-      text-align center
+  @import "../../common/stylus/variable"
+  .player
+    position fixed
+    top 0
+    left 0
+    right 0
+    bottom 0
+    z-index 1000
+    background $color-background
+    .back
+      position absolute
+      top 10px
+      left 10px
+      z-index 10000
+    .image-wrapper
+      position absolute
+      top 0
+      bottom 200px
+      left 0
+      right 0
+      .image
+        width 300px
+        height 300px
+        margin 0 auto
+        margin-top 100px
+        img
+          border-radius 50%
+    .control
+      position absolute
+      top 440px
+      bottom 0
+      left 0
+      right 0
+      .control-time
+        font-size 0
+        .time,.el-slider
+          line-height 50px
+          display inline-block
+          font-size $font-size-min
+        .time
+          width 10%
+          text-align center
+          color $color-theme
+        .el-slider
+          width 80%
+          align-items center
+      .control-song
+        .icon
+          text-align center
+          font-size 50px
+  .mini-player
+    display flex
+    position fixed
+    bottom 0
+    left 0
+    right 0
+    height 60px
+    background $color-background
+    z-index 100
+    .image
+      flex 1
+      img
+        margin-top 10px
+    .name
+      flex 3
+      line-height 20px
+      padding 10px
       font-size $font-size-min
       color $color-theme
-      &.currentTime
-        float left
-      &.allTime
-        float right
-    .el-slider
-      display inline-block
-      width 80%
+    .icon
+      flex 2
+      padding 10px
+      font-size 30px
+      border-radius 50%
+      color $color-theme
 </style>
