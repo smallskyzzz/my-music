@@ -1,21 +1,26 @@
 # my-music
 
-> A Vue.js project
+>这是一个后台基于网易云nodejs Api（地址：https://binaryify.github.io/NeteaseCloudMusicApi/#/）的vue音乐播放器WebApp，目前还在不断更新与完善中。
 
-## Build Setup
+>项目演示地址：http://smallsky.top/(建议在移动端模式下查看)。
+
+>新手项目初战，如果感觉可以的话请点个star吧。
+
+## 本地运行步骤
 
 ``` bash
-# install dependencies
+# 下载本项目后cd到相应的目录下，安装依赖
 npm install
 
-# serve with hot reload at localhost:8080
+# 运行项目
 npm run dev
 
-# build for production with minification
+# 通过上述网易云nodejs Api地址下载后cd到相应的目录下，安装依赖
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+# 运行后台
+node app.js
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+#本地查看
+浏览器打开http://localhost:8080/即可
+```
