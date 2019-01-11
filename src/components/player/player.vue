@@ -37,8 +37,9 @@
       <div class="icon">
         <i :class="isPlaying" @click.stop="togglePlay"></i>
         &nbsp;
-        <i class="el-icon-view"></i>
+        <i class="el-icon-view" @click.stop="toggleShowPlayList"></i>
       </div>
+      <play-list class="playList" v-show="showPlayList" ref="playList"></play-list>
     </div>
   </div>
 </template>
@@ -46,6 +47,7 @@
 <script>
 import {mapGetters, mapMutations} from 'vuex'
 import {getSongUrl, getSongDuration} from '../../api/player'
+import playList from '../../components/play-list/play-list'
 
 export default {
   data() {
@@ -53,7 +55,8 @@ export default {
       currentSongUrl: '', // 当前歌曲url
       currentTime: 0, // 当前播放到的时间
       duration: 0, // 当前歌曲总时间
-      playing: false // 是否在播放
+      playing: false, // 是否在播放
+      showPlayList: false // 是否显示播放列表
     }
   },
   methods: {
@@ -115,6 +118,14 @@ export default {
     pause() {
       this.playing = false
     },
+    toggleShowPlayList() {
+      this.showPlayList = !this.showPlayList
+      if (this.showPlayList) { // 因为设置为true后播放列表才会显示，此前未显示其height为0，所以无法滚动
+        setTimeout(() => {
+          this.$refs.playList.refresh()
+        }, 20)
+      }
+    },
     _pad(num, n = 2) {
       let len = num.toString().length
       while (len < n) {
@@ -125,7 +136,8 @@ export default {
     },
     ...mapMutations({
       'setFullScreen': 'SET_FULLSCREEN',
-      'setCurrentSong': 'SET_CURRENTSONG'
+      'setCurrentSong': 'SET_CURRENTSONG',
+      'setPlayList': 'SET_PLAYLIST'
     })
   },
   watch: {
@@ -161,6 +173,9 @@ export default {
       'playlist',
       'singer'
     ])
+  },
+  components: {
+    playList
   }
 }
 </script>
@@ -241,4 +256,9 @@ export default {
       font-size 30px
       border-radius 50%
       color $color-theme
+    .playList
+      position fixed
+      bottom 60px
+      left 0
+      height 200px
 </style>

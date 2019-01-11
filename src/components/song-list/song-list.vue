@@ -39,7 +39,7 @@ export default {
     }
   },
   created() {
-    if (this.songs.length === 0 && this.playlist.length === 0) {
+    if (this.songs.length === 0 && this.playlist.length === 0 && !this.singer.name) {
       this.$router.back()
       return
     }
