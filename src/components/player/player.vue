@@ -8,7 +8,13 @@
       </div>
     </div>
     <div v-show="!showImage" class="lyric-wrapper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-      <span class="lyric">{{lyric}}</span>
+      <scroll class="lyric" :data="lyric" ref="lyricScroll">
+        <ul>
+          <li v-for="(item, index) in lyric" :key="index" ref="lyricItem">
+            {{_formatLyric(item)}}
+          </li>
+        </ul>
+      </scroll>
     </div>
     <div class="control">
       <div class="control-time">
@@ -51,6 +57,7 @@
 import {mapGetters, mapMutations} from 'vuex'
 import {getSongUrl, getSongDuration, getSongLyric} from '../../api/player'
 import playList from '../../components/play-list/play-list'
+import Scroll from '../../base/scroll/scroll'
 
 export default {
   data() {
@@ -58,7 +65,7 @@ export default {
       currentSongUrl: '', // 当前歌曲url
       currentTime: 0, // 当前播放到的时间
       duration: 0, // 当前歌曲总时间
-      lyric: '', // 歌词
+      lyric: [], // 歌词
       playing: false, // 是否在播放
       showPlayList: false, // 是否显示播放列表
       showImage: true // 显示图片还是歌词
@@ -161,6 +168,17 @@ export default {
     touchEnd() {
 
     },
+    getTimes() {
+      let times = []
+      this.lyric.forEach((l) => {
+        let arr1 = l.substring(1)
+        let arr2 = arr1.split(']')
+        times.push(arr2[0])
+      })
+      times.pop()
+      // console.log(times)
+      return times
+    },
     _pad(num, n = 2) {
       let len = num.toString().length
       while (len < n) {
@@ -168,6 +186,10 @@ export default {
         len++
       }
       return num
+    },
+    _formatLyric(lyric) {
+      let l = lyric.split(']')
+      return l[1]
     },
     ...mapMutations({
       'setFullScreen': 'SET_FULLSCREEN',
@@ -193,8 +215,8 @@ export default {
                 // 偶尔出现获取不到歌曲url的情况（当部署在阿里云上时），这种方法也可获取到
                 getSongLyric(newVal.id).then((res) => {
                   if (res.data.code === 200) {
-                    this.lyric = res.data.lrc.lyric
-                    console.log(this.lyric.split('\n'))
+                    this.lyric = res.data.lrc.lyric.split('\n')
+                    // this.getTimes()
                   }
                 })
               }
@@ -202,6 +224,42 @@ export default {
           }
         })
       }
+    },
+    currentTime(newVal) {
+      let times = this.getTimes()
+      let timesArray = []
+      let nowItem = 0
+      times.forEach((time) => {
+        let arr = time.split(':')
+        let s = (parseInt(arr[0]) * 60 + parseFloat(arr[1])) * 1000
+        timesArray.push(s)
+      })
+      if (newVal < timesArray[0]) {
+        nowItem = 0
+      }
+      if (newVal > timesArray[timesArray.length - 1]) {
+        nowItem = timesArray.length - 1
+      }
+      for (let i = 0; i < timesArray.length; i++) {
+        if (newVal > timesArray[i] && newVal < timesArray[i + 1]) {
+          nowItem = i
+        }
+      }
+      // console.log(nowItem)
+      // console.log(timesArray)
+      setTimeout(() => {
+        let lyricItems = this.$refs.lyricItem
+        if (nowItem !== 0) {
+          this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem])
+        }
+        lyricItems.forEach((item, index) => {
+          if (index === nowItem) {
+            item.style.color = '#409EFF'
+          } else {
+            item.style.color = 'grey'
+          }
+        })
+      }, 20)
     }
   },
   computed: {
@@ -216,7 +274,8 @@ export default {
     ])
   },
   components: {
-    playList
+    playList,
+    Scroll
   }
 }
 </script>
@@ -257,8 +316,15 @@ export default {
       right 0
       overflow scroll
       .lyric
+        width 300px
+        height 300px
+        margin 0 auto
+        margin-top 100px
+        overflow hidden
         white-space: pre-line
-        font-size $font-size-min
+        text-align center
+        line-height 20px
+        font-size $font-size-medium
         color $color-border
     .control
       position absolute
