@@ -2,10 +2,13 @@
   <div>
     <div class="player" v-show="currentSong.name && fullScreen">
     <i class="el-icon-arrow-down back" @click="close"></i>
-    <div class="image-wrapper">
+    <div v-show="showImage" class="image-wrapper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
       <div class="image">
         <img width="100%" height="100%" :src="currentSong.image || singer.image"/>
       </div>
+    </div>
+    <div v-show="!showImage" class="lyric-wrapper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+      <span class="lyric">{{lyric}}</span>
     </div>
     <div class="control">
       <div class="control-time">
@@ -46,7 +49,7 @@
 
 <script>
 import {mapGetters, mapMutations} from 'vuex'
-import {getSongUrl, getSongDuration} from '../../api/player'
+import {getSongUrl, getSongDuration, getSongLyric} from '../../api/player'
 import playList from '../../components/play-list/play-list'
 
 export default {
@@ -55,9 +58,14 @@ export default {
       currentSongUrl: '', // 当前歌曲url
       currentTime: 0, // 当前播放到的时间
       duration: 0, // 当前歌曲总时间
+      lyric: '', // 歌词
       playing: false, // 是否在播放
-      showPlayList: false // 是否显示播放列表
+      showPlayList: false, // 是否显示播放列表
+      showImage: true // 显示图片还是歌词
     }
+  },
+  created() {
+    this.touch = {} // 初始化touch，用于滑动监听
   },
   methods: {
     close() {
@@ -126,6 +134,33 @@ export default {
         }, 20)
       }
     },
+    touchStart(e) {
+      this.touch.inited = true
+      console.log(e)
+      const touch = e.touches[0]
+      this.touch.startX = touch.pageX
+      this.touch.startY = touch.pageY
+    },
+    touchMove(e) {
+      if (!this.touch.inited) {
+        return
+      }
+      const touch = e.touches[0]
+      const deltaX = touch.pageX - this.touch.startX
+      const deltaY = touch.pageY - this.touch.startY
+      if (Math.abs(deltaY) > Math.abs(deltaX)) { // 当纵轴的滚动之大于纵轴时，什么都不做（认为在滚动歌词而非切换页面）
+        return
+      }
+      if (deltaX > 20) {
+        this.showImage = true
+      }
+      if (deltaX < -20) {
+        this.showImage = false
+      }
+    },
+    touchEnd() {
+
+    },
     _pad(num, n = 2) {
       let len = num.toString().length
       while (len < n) {
@@ -156,6 +191,12 @@ export default {
                 // this.currentSongUrl = `https://music.163.com/song/media/outer/url?id=${newVal.id}.mp3`
                 // alert(this.currentSongUrl)
                 // 偶尔出现获取不到歌曲url的情况（当部署在阿里云上时），这种方法也可获取到
+                getSongLyric(newVal.id).then((res) => {
+                  if (res.data.code === 200) {
+                    this.lyric = res.data.lrc.lyric
+                    console.log(this.lyric.split('\n'))
+                  }
+                })
               }
             })
           }
@@ -208,6 +249,17 @@ export default {
         margin-top 100px
         img
           border-radius 50%
+    .lyric-wrapper
+      position absolute
+      top 0
+      bottom 200px
+      left 0
+      right 0
+      overflow scroll
+      .lyric
+        white-space: pre-line
+        font-size $font-size-min
+        color $color-border
     .control
       position absolute
       top 440px
