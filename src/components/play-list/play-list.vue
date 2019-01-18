@@ -23,10 +23,21 @@ export default {
         return item === l
       })
       if (index > -1) {
-        let list = this.playlist.slice(0)
-        list.splice(index, 1)
-        this.setPlayList(list)
+        if (l.id === this.currentSong.id) {
+          let currentIndex = this.playlist.indexOf(l)
+          let cIndex = currentIndex === this.playlist.length ? 0 : currentIndex + 1
+          this.setCurrentSong(this.playlist[cIndex])
+          let list = this.playlist.slice(0)
+          list.splice(currentIndex, 1)
+          this.setPlayList(list)
+        } else {
+          let list = this.playlist.slice(0)
+          list.splice(index, 1)
+          this.setPlayList(list)
+        }
       }
+      // console.log(l)
+      // console.log(this.currentSong)
     },
     play(l) {
       this.setCurrentSong(l)
@@ -41,7 +52,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'playlist'
+      'playlist',
+      'currentSong'
     ])
   },
   components: {

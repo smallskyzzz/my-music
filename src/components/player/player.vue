@@ -3,20 +3,24 @@
     <div class="player" v-show="currentSong.name && fullScreen">
     <i class="el-icon-arrow-down back" @click="close"></i>
     <div v-show="showImage" class="image-wrapper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
-      <div class="image">
+      <div class="image" :class="ifRotated">
         <img width="100%" height="100%" :src="currentSong.image || singer.image"/>
       </div>
     </div>
     <div v-show="!showImage" class="lyric-wrapper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
       <scroll class="lyric" :data="lyric" ref="lyricScroll">
         <ul>
-          <li v-for="(item, index) in lyric" :key="index" ref="lyricItem">
+          <li v-for="(item, index) in lyric" :key="index" ref="lyricItem" v-show="_formatLyric(item)">
             {{_formatLyric(item)}}
           </li>
         </ul>
       </scroll>
     </div>
     <div class="control">
+      <div class="dots">
+        <span class="dot" :class="{active:currentIndex === 0}"></span>
+        <span class="dot" :class="{active:currentIndex === 1}"></span>
+      </div>
       <div class="control-time">
         <span class="time">{{format(currentTime / 1000)}}</span>
         <el-slider class="el-slider" v-model="currentTime" :max="duration" @change="change"></el-slider>
@@ -68,7 +72,8 @@ export default {
       lyric: [], // 歌词
       playing: false, // 是否在播放
       showPlayList: false, // 是否显示播放列表
-      showImage: true // 显示图片还是歌词
+      showImage: true, // 显示图片还是歌词
+      currentIndex: 0 // 当前所在页面
     }
   },
   created() {
@@ -160,9 +165,11 @@ export default {
       }
       if (deltaX > 20) {
         this.showImage = true
+        this.currentIndex = 0
       }
       if (deltaX < -20) {
         this.showImage = false
+        this.currentIndex = 1
       }
     },
     touchEnd() {
@@ -209,8 +216,8 @@ export default {
             getSongUrl(newVal.id).then((res) => {
               if (res.data.code === 200) {
                 console.log(res)
-                this.currentSongUrl = res.data.data[0].url
-                // this.currentSongUrl = `https://music.163.com/song/media/outer/url?id=${newVal.id}.mp3`
+                // this.currentSongUrl = res.data.data[0].url
+                this.currentSongUrl = `https://music.163.com/song/media/outer/url?id=${newVal.id}.mp3`
                 // alert(this.currentSongUrl)
                 // 偶尔出现获取不到歌曲url的情况（当部署在阿里云上时），这种方法也可获取到
                 getSongLyric(newVal.id).then((res) => {
@@ -250,10 +257,20 @@ export default {
       setTimeout(() => {
         let lyricItems = this.$refs.lyricItem
         if (nowItem !== 0) {
-          this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem])
+          if (this.lyric[nowItem].split(']')[1] === '') {
+            this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem - 1])
+          } else {
+            this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem])
+          }
         }
         lyricItems.forEach((item, index) => {
-          if (index === nowItem) {
+          let flag
+          if (this.lyric[nowItem].split(']')[1] === '') {
+            flag = nowItem - 1
+          } else {
+            flag = nowItem
+          }
+          if (index === flag) {
             item.style.color = '#409EFF'
           } else {
             item.style.color = 'grey'
@@ -265,6 +282,9 @@ export default {
   computed: {
     isPlaying() {
       return this.playing ? 'el-icon-check' : 'el-icon-caret-right'
+    },
+    ifRotated() {
+      return this.playing ? 'play' : 'pause'
     },
     ...mapGetters([
       'currentSong',
@@ -306,6 +326,10 @@ export default {
         height 300px
         margin 0 auto
         margin-top 100px
+        &.play
+          animation: rotate 20s linear infinite
+        &.pause
+          animation-play-state paused
         img
           border-radius 50%
     .lyric-wrapper
@@ -332,6 +356,21 @@ export default {
       bottom 0
       left 0
       right 0
+      .dots
+        height 20px
+        text-align center
+        font-size 0
+        .dot
+          display inline-block
+          margin 0 4px
+          width 8px
+          height 8px
+          border-radius 50%
+          background white
+          &.active
+            width 20px
+            border-radius 5px
+            background $color-theme
       .control-time
         font-size 0
         .time,.el-slider
