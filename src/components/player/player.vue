@@ -41,19 +41,21 @@
     </audio>
   </div>
     <div class="mini-player" v-show="currentSong.name && !fullScreen" @click="open">
-      <div class="image" align="center">
-        <img width="40" height="40" :src="currentSong.image || singer.image">
-      </div>
-      <div class="name">
-        <span>{{currentSong.name}}<br>--{{currentSong.artist}}</span>
+      <div class="left">
+        <div class="image">
+          <img width="40" height="40" :src="currentSong.image || singer.image">
+        </div>
+        <div class="name">
+          <span class="song-detail">{{currentSong.name}}<br>--{{currentSong.artist}}</span>
+        </div>
       </div>
       <div class="icon">
         <i :class="isPlaying" @click.stop="togglePlay"></i>
-        &nbsp;
+        &nbsp;&nbsp;
         <i class="el-icon-view" @click.stop="toggleShowPlayList"></i>
       </div>
-      <play-list class="playList" v-show="showPlayList" ref="playList"></play-list>
     </div>
+    <play-list class="playList" v-show="showPlayList" ref="playList"></play-list>
   </div>
 </template>
 
@@ -392,30 +394,32 @@ export default {
     display flex
     position fixed
     bottom 0
-    left 0
-    right 0
+    width 100%
     height 60px
     background $color-background
     z-index 100
-    .image
+    .left
       flex 1
-      img
-        margin-top 10px
-    .name
-      flex 3
-      line-height 20px
-      padding 10px
-      font-size $font-size-min
-      color $color-theme
+      display flex
+      overflow hidden
+      .image
+        flex 0 40px
+        padding 10px
+      .name
+        flex 1
+        text-overflow ellipsis
+        white-space nowrap
+        overflow hidden
+        padding 10px
+        line-height 20px
+        font-size $font-size-medium
+        color $color-theme
     .icon
-      flex 2
-      padding 10px
+      flex 0 100px
+      display flex
+      justify-content center
+      align-items center
+      text-align center
       font-size 30px
-      border-radius 50%
       color $color-theme
-    .playList
-      position fixed
-      bottom 60px
-      left 0
-      height 200px
 </style>
