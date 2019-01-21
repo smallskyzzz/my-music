@@ -7,7 +7,7 @@
       <button class="btn" @click="playAll">播放全部</button>
     </div>
     <scroll :data="songs" class="songs" ref="songs">
-        <ul v-show="songs.length > 0" ref="songs">
+        <ul v-show="songs.length > 0" ref="lists">
           <li v-for="(song, index) in songs" :key="index" class="song" @click="selectItem(song)">
             {{song.name}}
           </li>
@@ -63,7 +63,7 @@ export default {
       this.setFullScreen(true)
     },
     playAll() {
-      console.log(this.$refs.songs.children[0])
+      console.log(this.$refs.lists.children[0])
       this.selectItem(this.songs[0])
     },
     handlePlayer(currentSong) {
