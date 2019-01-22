@@ -28,11 +28,11 @@
       </div>
       <div class="control-song">
         <div class="icon">
-          <i class="el-icon-arrow-left" @click="prev"></i>
+          <i class="iconfont icon-step-backward" @click="prev"></i>
           &nbsp;
-          <i :class="isPlaying" @click="togglePlay"></i>
+          <i class="iconfont" :class="isPlaying" @click="togglePlay"></i>
           &nbsp;
-          <i class="el-icon-arrow-right" @click="next"></i>
+          <i class="iconfont icon-step-forward" @click="next"></i>
         </div>
       </div>
     </div>
@@ -50,12 +50,15 @@
         </div>
       </div>
       <div class="icon">
-        <i :class="isPlaying" @click.stop="togglePlay"></i>
+        <i class="iconfont" :class="isPlaying" @click.stop="togglePlay"></i>
         &nbsp;&nbsp;
-        <i class="el-icon-view" @click.stop="toggleShowPlayList"></i>
+        <i class="iconfont icon-unorderedlist" @click.stop="toggleShowPlayList"></i>
       </div>
     </div>
-    <play-list class="playList" v-show="showPlayList" ref="playList"></play-list>
+    <div class="playList-wrapper" v-show="showPlayList">
+      <div class="blur" @click="closeShowPlayList"></div>
+      <play-list class="playList" ref="playList"></play-list>
+    </div>
   </div>
 </template>
 
@@ -147,6 +150,9 @@ export default {
           this.$refs.playList.refresh()
         }, 20)
       }
+    },
+    closeShowPlayList() {
+      this.showPlayList = false
     },
     touchStart(e) {
       this.touch.inited = true
@@ -283,7 +289,7 @@ export default {
   },
   computed: {
     isPlaying() {
-      return this.playing ? 'el-icon-check' : 'el-icon-caret-right'
+      return this.playing ? 'icon-timeout' : 'icon-play-circle'
     },
     ifRotated() {
       return this.playing ? 'play' : 'pause'
@@ -390,6 +396,8 @@ export default {
         .icon
           text-align center
           font-size 50px
+          .iconfont
+            font-size 50px
   .mini-player
     display flex
     position fixed
@@ -420,6 +428,24 @@ export default {
       justify-content center
       align-items center
       text-align center
-      font-size 30px
       color $color-theme
+      .iconfont
+        font-size 30px
+  .playList-wrapper
+    position fixed
+    display flex
+    flex-direction column
+    top 0
+    left 0
+    right 0
+    bottom 60px
+    z-index 10000
+    .blur
+      flex 1
+      filter blur(100px)
+      background $color-background
+    .playList
+      flex 0 200px
+      border-radius 5px
+      height 200px
 </style>

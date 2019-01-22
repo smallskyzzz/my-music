@@ -4,6 +4,7 @@
       <h2 class="title">播放列表</h2>
       <ul>
         <li v-for="(l,index) in playlist" :key="index" class="song">
+          <i class="iconfont icon-customerservice"></i>
           <span class="name" @click.stop="play(l)">{{l.name}}</span>
           <i class="el-icon-close" @click.stop="deleteOne(l)"></i>
         </li>

@@ -9,6 +9,7 @@ import store from './store'
 
 import 'element-ui/packages/theme-chalk/src/index.scss'
 import './common/stylus/index.styl'
+import './common/fonts/iconfont.css'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

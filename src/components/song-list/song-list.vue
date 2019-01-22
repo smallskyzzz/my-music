@@ -9,6 +9,7 @@
     <scroll :data="songs" class="songs" ref="songs">
         <ul v-show="songs.length > 0" ref="lists">
           <li v-for="(song, index) in songs" :key="index" class="song" @click="selectItem(song)">
+            <i class="iconfont icon-customerservice"></i>
             {{song.name}}
           </li>
         </ul>
