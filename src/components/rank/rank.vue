@@ -17,7 +17,9 @@
       </ul>
     </scroll>
     <loading v-show="!ranks.length"></loading>
-    <router-view parent="rank"></router-view>
+    <transition name="page-fade-in">
+      <router-view parent="rank"></router-view>
+    </transition>
   </div>
 </template>
 
@@ -94,6 +96,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus">
 @import "../../common/stylus/variable"
+@import "../../common/stylus/animation.styl"
 .rank
   position fixed
   overflow hidden

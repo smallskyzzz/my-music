@@ -20,7 +20,9 @@
       </div>
     </scroll>
     <loading v-show="!arrs.length"></loading>
-    <router-view parent="recommend"></router-view>
+    <transition name="page-fade-in">
+      <router-view parent="recommend"></router-view>
+    </transition>
   </div>
 </template>
 
@@ -115,6 +117,7 @@ export default {
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/variable"
+  @import "../../common/stylus/animation.styl"
   .recommend
     position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
     overflow hidden

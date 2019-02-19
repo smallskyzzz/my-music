@@ -20,7 +20,9 @@
       </div>
     </scroll>
     <loading v-show="!singerList.length"></loading>
-    <router-view></router-view>
+    <transition name="page-fade-in">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
@@ -193,6 +195,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus">
 @import "../../common/stylus/variable"
+@import "../../common/stylus/animation.styl"
 .singer
   position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
   overflow hidden

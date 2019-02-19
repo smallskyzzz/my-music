@@ -1,0 +1,52 @@
+//页面滑入动画
+.page-fade-in-enter-active {
+  transition: all .3s ease;
+}
+.page-fade-in-leave-active {
+  transition: all .8s ease;
+}
+.page-fade-in-enter, .page-fade-in-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.change-enter-active {
+  animation: show .5s
+}
+.change-leave-active {
+  animation: hide .5s
+}
+@keyframes show {
+  0% {
+    opacity: 0
+  }
+  25% {
+    opacity: 0.25
+  }
+  50% {
+    opacity: 0.5
+  }
+  75% {
+    opacity: 0.75
+  }
+  100% {
+    opacity: 1
+  }
+}
+@keyframes hide {
+  0% {
+    opacity: 1
+  }
+  25% {
+    opacity: 0.75
+  }
+  50% {
+    opacity: 0.5
+  }
+  75% {
+    opacity: 0.25
+  }
+  100% {
+    opacity: 0
+  }
+}

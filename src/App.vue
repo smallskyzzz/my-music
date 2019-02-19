@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <tab></tab>
-    <keep-alive>
-      <router-view></router-view>
-    </keep-alive>
+    <transition name="change">
+      <keep-alive>
+        <router-view></router-view>
+      </keep-alive>
+    </transition>
     <player></player>
   </div>
 </template>
@@ -21,4 +23,5 @@ export default {
 </script>
 
 <style>
+  @import "/common/stylus/animation.styl";
 </style>

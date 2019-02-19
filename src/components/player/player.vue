@@ -42,7 +42,7 @@
   </div>
     <div class="mini-player" v-show="currentSong.name && !fullScreen" @click="open">
       <div class="left">
-        <div class="image">
+        <div class="image" :class="ifRotated">
           <img width="40" height="40" :src="currentSong.image || singer.image">
         </div>
         <div class="name">
@@ -413,6 +413,12 @@ export default {
       .image
         flex 0 40px
         padding 10px
+        &.play
+          animation: rotate 20s linear infinite
+        &.pause
+          animation-play-state paused
+        img
+          border-radius 50%
       .name
         flex 1
         text-overflow ellipsis
