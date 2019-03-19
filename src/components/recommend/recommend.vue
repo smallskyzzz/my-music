@@ -19,7 +19,7 @@
         </div>
       </div>
     </scroll>
-    <loading v-show="!arrs.length"></loading>
+    <loading v-show="!arrs.length || showLoading"></loading>
     <transition name="page-fade-in">
       <router-view parent="recommend"></router-view>
     </transition>
@@ -41,7 +41,8 @@ export default {
   data() {
     return {
       banners: [], // 轮播
-      personalized: [] // 推荐歌单
+      personalized: [], // 推荐歌单
+      showLoading: false // 是否显示loading组件
     }
   },
   computed: {
@@ -58,14 +59,20 @@ export default {
   },
   methods: {
     selectItem(item) {
-      getDetail(item.id).then((res) => {
-        this.setSinger(new Singer({
-          id: 0,
-          image: item.picUrl
-        }))
-        this.setPlaylist(this._normalizeSong(res.data.playlist))
-        this.$router.push(`/recommend/${item.id}`)
-      })
+      if (!this.showLoading) {
+        this.$refs.scroll.$el.style.opacity = 0.1 // 点击后显示正在加载效果
+        this.showLoading = true
+        getDetail(item.id).then((res) => {
+          this.setSinger(new Singer({
+            id: 0,
+            image: item.picUrl
+          }))
+          this.setPlaylist(this._normalizeSong(res.data.playlist))
+          this.$router.push(`/recommend/${item.id}`)
+          this.$refs.scroll.$el.style.opacity = 1 // 正在加载效果复原
+          this.showLoading = false
+        })
+      }
     },
     handlePlayer(currentSong) {
       const bottom = currentSong.name ? '60px' : 0

@@ -214,8 +214,9 @@ export default {
       color $color-theme
     .hot-item
       padding-top 10px
+      .item + .item
+        margin 0  0  0 5px
       .item
-        margin 0 5px
         font-size $font-size-min
         color $color-border
   .history
