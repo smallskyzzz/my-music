@@ -2,8 +2,8 @@ import axios from 'axios'
 
 export function getHot() {
   let promise = new Promise((resolve, reject) => {
-    axios.get('/api' + '/search/hot').then((res) => {
-    // axios.get('http://149.129.68.90:3000' + '/search/hot').then((res) => {
+    // axios.get('/api' + '/search/hot').then((res) => {
+    axios.get('http://47.93.219.17:3000' + '/search/hot').then((res) => {
       resolve(res)
     }).catch(err => {
       reject(err)
@@ -14,8 +14,8 @@ export function getHot() {
 
 function getSearch(name, type) {
   let promise = new Promise((resolve, reject) => {
-    axios.get('/api' + `/search?keywords=${name}&type=${type}`).then((res) => {
-    // axios.get('http://149.129.68.90:3000' + `/search?keywords=${name}&type=${type}`).then((res) => {
+    // axios.get('/api' + `/search?keywords=${name}&type=${type}`).then((res) => {
+    axios.get('http://47.93.219.17:3000' + `/search?keywords=${name}&type=${type}`).then((res) => {
       resolve(res)
     }).catch(err => {
       reject(err)
