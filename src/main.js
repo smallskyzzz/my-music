@@ -14,7 +14,7 @@ import './common/fonts/iconfont.css'
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(VueLazyLoad, {
-  loading: require('./loading.jpg')
+  loading: require('./loading2.gif')
 })
 
 /* eslint-disable no-new */
