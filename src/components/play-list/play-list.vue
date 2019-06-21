@@ -1,9 +1,9 @@
 <template>
   <scroll class="play-list" :data="playlist" ref="playList">
     <div>
-      <h2 class="title">播放列表</h2>
+      <!--<h2 class="title">播放列表</h2>-->
       <ul>
-        <li v-for="(l,index) in playlist" :key="index" class="song">
+        <li v-for="(l,index) in playlist" :key="index" class="song" :class="{active: currentIndex === index}">
           <i class="iconfont icon-customerservice"></i>
           <span class="name" @click.stop="play(l)">{{l.name}}</span>
           <i class="el-icon-close" @click.stop="deleteOne(l)"></i>
@@ -55,7 +55,14 @@ export default {
     ...mapGetters([
       'playlist',
       'currentSong'
-    ])
+    ]),
+    currentIndex () {
+      let x = this.playlist.findIndex((value) => {
+        return this.currentSong === value
+      })
+      // alert(0)
+      return x
+    }
   },
   components: {
     Scroll
@@ -71,16 +78,18 @@ export default {
   width 100%
   border-radius 10px
   background $color-background
-  .title
-    line-height 30px
-    text-align center
-    color $color-theme
+  // .title
+    // line-height 30px
+    // text-align center
+    // color $color-theme
   .song
     position relative
     padding 2px
     line-height 20px
     font-size $font-size-medium
-    color $color-theme
+    color #808080
+    &.active
+      color $color-theme
     .el-icon-close
       position absolute
       right 10px

@@ -57,6 +57,7 @@
     </div>
     <div class="playList-wrapper" v-show="showPlayList">
       <div class="blur" @click="closeShowPlayList"></div>
+      <div class="title">播放列表</div>
       <play-list class="playList" ref="playList"></play-list>
     </div>
   </div>
@@ -448,8 +449,15 @@ export default {
     z-index 10000
     .blur
       flex 1
-      filter blur(100px)
+      // filter blur(100px)
       background $color-background
+      opacity .8
+    .title
+      flex 0 30px
+      background-color $color-background
+      line-height 30px
+      text-align center
+      color $color-theme
     .playList
       flex 0 200px
       border-radius 5px

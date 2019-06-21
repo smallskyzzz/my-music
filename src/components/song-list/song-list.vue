@@ -94,7 +94,7 @@ export default {
         }))
       })
       this.setPlaylist(this.songs)
-      console.log(this.songs)
+      // console.log(this.songs)
     },
     ...mapMutations({
       setPlaylist: 'SET_PLAYLIST',
