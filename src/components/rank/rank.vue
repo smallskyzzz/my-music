@@ -76,7 +76,7 @@ export default {
         res.forEach((r) => {
           if (r.data.code === 200) {
             this.ranks.push(r.data.playlist)
-            console.log(this.ranks)
+            // console.log(this.ranks)
           }
         })
       })

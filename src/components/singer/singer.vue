@@ -172,7 +172,6 @@ export default {
           setTimeout(() => {
             this._calculateHeight() // 计算每个shortcut对应的高度
           }, 20)
-          console.log(this.singers)
         }
       })
     },
@@ -224,7 +223,6 @@ export default {
       this.listHeight.forEach((item, index) => {
         item === 0 ? item += 0 : this.listHeight[index] += SHEIGHT * (index)
       })
-      console.log(this.listHeight)
     },
     ...mapMutations({
       setSinger: 'SET_SINGER'

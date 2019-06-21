@@ -134,7 +134,7 @@ export default {
       timer = setTimeout(() => {
         if (newVal) {
           search(newVal).then((res) => { // res为数组，第一项为歌手，第二项为歌曲
-            console.log(res)
+            // console.log(res)
             if (res[0].data.code === 200) {
               if (res[0].data.result.albumCount !== 0) {
                 this.singer = new Singer({
@@ -142,7 +142,7 @@ export default {
                   name: res[0].data.result.albums[0].artist.name,
                   image: res[0].data.result.albums[0].artist.picUrl
                 })
-                console.log(this.singer)
+                // console.log(this.singer)
               }
             } else {
               this.singer = {}
@@ -165,7 +165,7 @@ export default {
                 this.albumCount = 0
               }
             }
-            console.log(this.songs)
+            // console.log(this.songs)
           })
         } else {
           this.songs = []

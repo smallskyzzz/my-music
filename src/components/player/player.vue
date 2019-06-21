@@ -157,7 +157,7 @@ export default {
     },
     touchStart(e) {
       this.touch.inited = true
-      console.log(e)
+      // console.log(e)
       const touch = e.touches[0]
       this.touch.startX = touch.pageX
       this.touch.startY = touch.pageY
@@ -224,7 +224,7 @@ export default {
             this.duration = res.data.songs[0].dt
             getSongUrl(newVal.id).then((res) => {
               if (res.data.code === 200) {
-                console.log(res)
+                // console.log(res)
                 // this.currentSongUrl = res.data.data[0].url
                 this.currentSongUrl = `https://music.163.com/song/media/outer/url?id=${newVal.id}.mp3`
                 // alert(this.currentSongUrl)

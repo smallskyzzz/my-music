@@ -17,6 +17,9 @@
 import {mapGetters, mapMutations} from 'vuex'
 import Scroll from '../../base/scroll/scroll'
 
+// 播放列表的每项高度
+const itemHeight = 25
+
 export default {
   methods: {
     deleteOne(l) {
@@ -62,6 +65,13 @@ export default {
       })
       // alert(0)
       return x
+    }
+  },
+  watch: {
+    currentIndex: function (newVal) {
+      if (newVal > 2) {
+        this.$refs.playList.scrollTo(-(newVal - 2) * itemHeight)
+      }
     }
   },
   components: {

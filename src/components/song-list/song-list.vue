@@ -64,7 +64,7 @@ export default {
       this.setFullScreen(true)
     },
     playAll() {
-      console.log(this.$refs.lists.children[0])
+      // console.log(this.$refs.lists.children[0])
       this.selectItem(this.songs[0])
     },
     handlePlayer(currentSong) {
@@ -78,7 +78,7 @@ export default {
         return
       }
       getSongBySinger(this.singer.id).then((res) => {
-        console.log(res)
+        // console.log(res)
         if (res.data.code === 200) {
           this._normalizeSongs(res.data.hotSongs)
         }

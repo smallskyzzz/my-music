@@ -16,7 +16,6 @@ function getPersonalized() {
   let promise = new Promise((resolve, reject) => {
     // axios.get('/api' + '/personalized').then((res) => {
     axios.get('http://47.93.219.17:3000' + '/personalized').then((res) => {
-      console.log(res)
       resolve(res)
     }).catch(err => {
       reject(err)
@@ -27,7 +26,6 @@ function getPersonalized() {
 }
 
 export function getRecommend() {
-  console.log(4)
   return Promise.all([getBanner(), getPersonalized()])
 }
 

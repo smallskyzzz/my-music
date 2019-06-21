@@ -16,7 +16,6 @@ export function getSongBySinger(id) {
   let promise = new Promise((resolve, reject) => {
     // axios.get('/api' + `/artists?id=${id}`).then((res) => {
     axios.get('http://47.93.219.17:3000' + `/artists?id=${id}`).then((res) => {
-      console.log(res)
       resolve(res)
     }).catch(err => {
       reject(err)
