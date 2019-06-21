@@ -23,6 +23,9 @@ export default {
     refresh() {
       this.scroll && this.scroll.refresh()
     },
+    scrollTo(y) {
+      this.scroll && this.scroll.scrollTo(0, y, 0.1)
+    },
     scrollToElement() {
       this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     },

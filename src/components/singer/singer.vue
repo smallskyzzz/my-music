@@ -2,12 +2,25 @@
   <div>
     <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList" v-show="singerList.length">
       <div>
+        <!--<ul>-->
+          <!--<li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem" @click="selectItem(singer)">-->
+            <!--<div class="image">-->
+              <!--<img height="50" width="50" v-lazy="singer.image">-->
+            <!--</div>-->
+            <!--<span class="name">{{singer.name}}</span>-->
+          <!--</li>-->
+        <!--</ul>-->
         <ul>
-          <li v-for="(singer,index) in singerList" :key="index" class="singer-item" ref="singerItem" @click="selectItem(singer)">
-            <div class="image">
-              <img height="50" width="50" v-lazy="singer.image">
-            </div>
-            <span class="name">{{singer.name}}</span>
+          <li v-for="(arr, i) in singers" :key="i">
+            <ul class="singer-items" ref="singerItems">
+              <p class="item-shortcut">{{ arr.shortcut }}</p>
+              <li v-for="(singer, ii) in arr.singers" :key="ii" ref="singerItem" class="singer-item" @click="selectItem(singer)">
+                <div class="image">
+                  <img height="50" width="50" v-lazy="singer.image">
+                </div>
+                <span class="name">{{singer.name}}</span>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -36,6 +49,7 @@ import Loading from '../../base/loading/loading'
 
 const pinyin = require('pinyin')
 const HEIGHT = 60 // 每个li的高度
+const SHEIGHT = 30 // 每个li分类的高度
 
 export default {
   mixins: [playerMixin],
@@ -53,19 +67,43 @@ export default {
     // console.log(pinyin('a'))
   },
   computed: {
-    currentIndex() {
-      if (this.posY >= 0) {
-        // console.log(0)
-        return 0
-      } else {
+    // currentIndex() {
+    //   console.log(this.posY)
+    //   if (this.posY >= 0) {
+    //     // console.log(0)
+    //     return 0
+    //   } else {
+    //     // console.log(this.posY)
+    //     // console.log(this.listHeight)
+    //     for (let i = 0; i < this.listHeight.length - 1; i++) {
+    //       if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
+    //         // console.log(i)
+    //         return i
+    //       }
+    //     }
+    //   }
+    // }
+    // computed中需要这样写不然会报warn
+    currentIndex: {
+      get: function () {
         // console.log(this.posY)
-        // console.log(this.listHeight)
-        for (let i = 0; i < this.listHeight.length - 1; i++) {
-          if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
+        if (this.posY >= 0) {
+          // console.log(0)
+          return 0
+        } else {
+          // console.log(this.posY)
+          // console.log(this.listHeight)
+          for (let i = 0; i < this.listHeight.length - 1; i++) {
             // console.log(i)
-            return i
+            // console.log(this.posY)
+            if (-this.posY > this.listHeight[i] && -this.posY < this.listHeight[i + 1]) {
+              // console.log(i)
+              return i
+            }
           }
         }
+      },
+      set: function () {
       }
     }
   },
@@ -98,13 +136,16 @@ export default {
       this.posY = posY
     },
     clickShortcut(index) {
-      let singerItem = this.$refs.singerItem
+      // let singerItems = this.$refs.singerItems
       let nums = 0
       for (let i = 0; i < index; i++) {
         nums += this.singers[i].singers.length
       }
       this.currentIndex = index
-      this.$refs.singer.scrollToElement(singerItem[nums], 0)
+      // this.$refs.singer.scrollToElement(singerItems[nums], 0)
+      this.posY = -(nums * HEIGHT + index * SHEIGHT)
+      // 这里需要滚动一像素，因为不知道为什么点击shortcut不会触发shortcut样式的改变
+      this.$refs.singer.scrollTo(this.posY - 1)
     },
     selectItem(singer) {
       this.$router.push({
@@ -180,7 +221,10 @@ export default {
         }
         this.listHeight.push(singerHeight)
       }
-      // console.log(this.listHeight)
+      this.listHeight.forEach((item, index) => {
+        item === 0 ? item += 0 : this.listHeight[index] += SHEIGHT * (index)
+      })
+      console.log(this.listHeight)
     },
     ...mapMutations({
       setSinger: 'SET_SINGER'
@@ -202,17 +246,23 @@ export default {
   width 100%
   top 40px
   bottom 0
-  .singer-item
-    display flex
-    box-sizing border-box
-    padding 5px
-    height 60px
-    .image
-      flex 0 0 60px
-    .name
-      flex 1
-      line-height 50px
-      font-size $font-size-medium
+  .singer-items
+    .item-shortcut
+      height 20px
+      line-height 20px
+      padding 5px
+      color $color-theme
+    .singer-item
+      display flex
+      box-sizing border-box
+      padding 5px
+      height 60px
+      .image
+        flex 0 0 60px
+      .name
+        flex 1
+        line-height 50px
+        font-size $font-size-medium
   .shortcut
     position absolute
     top 20px
