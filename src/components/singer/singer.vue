@@ -258,7 +258,7 @@ export default {
 }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus" scoped>
 @import "../../common/stylus/variable"
 @import "../../common/stylus/animation.styl"
 .title
@@ -271,7 +271,8 @@ export default {
   padding 5px
   color #409eff
   background-color #222
-.singer
+  // 加上deep，否则对子组件不起作用
+/deep/ .singer
   position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
   overflow hidden
   width 100%
