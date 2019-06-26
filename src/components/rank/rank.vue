@@ -101,7 +101,7 @@ export default {
   position fixed
   overflow hidden
   width 100%
-  top 40px
+  top 80px
   bottom 0
   .item
     display flex

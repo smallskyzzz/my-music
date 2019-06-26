@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div class="title" ref="title">{{title}}</div>
     <scroll class="singer" ref="singer" @scrollY="scrollY" :data="singerList" v-show="singerList.length">
       <div>
         <!--<ul>-->
@@ -48,7 +49,7 @@ import {playerMixin} from '../../common/js/mixin'
 import Loading from '../../base/loading/loading'
 
 const pinyin = require('pinyin')
-const HEIGHT = 60 // 每个li的高度
+const HEIGHT = 70 // 每个li的高度
 const SHEIGHT = 30 // 每个li分类的高度
 
 export default {
@@ -58,6 +59,7 @@ export default {
       singers: [], // 处理好的数据结构
       singerList: [], // 歌手一维数组
       listHeight: [], // 计算每个shortcut的height
+      title: '热', // 当前的标题
       // currentIndex: 0, // 当前shortcut的index
       posY: 0 // 当前滚动的y值
     }
@@ -86,7 +88,7 @@ export default {
     // computed中需要这样写不然会报warn
     currentIndex: {
       get: function () {
-        // console.log(this.posY)
+        // console.log(this.singers)
         if (this.posY >= 0) {
           // console.log(0)
           return 0
@@ -104,6 +106,27 @@ export default {
         }
       },
       set: function () {
+      }
+    }
+  },
+  watch: {
+    posY: function (newVal) {
+      newVal > 0 ? this.$refs.title.style.display = 'none' : this.$refs.title.style.display = 'block'
+      if (this.currentIndex >= 0) {
+        let x = newVal + this.listHeight[this.currentIndex + 1]
+        if (x < SHEIGHT) {
+          // 这里top变化后会覆盖tab，设置z-index也无效，只好用opacity
+          this.$refs.title.style.top = `${50 + x}px`
+          this.$refs.title.style.opacity = x / SHEIGHT
+        } else {
+          this.$refs.title.style.top = '80px'
+          this.$refs.title.style.opacity = 1
+        }
+      }
+    },
+    currentIndex: function (newVal) {
+      if (JSON.parse(JSON.stringify(this.singers))[newVal].shortcut) {
+        this.title = JSON.parse(JSON.stringify(this.singers))[newVal].shortcut
       }
     }
   },
@@ -238,11 +261,21 @@ export default {
 <style lang="stylus" rel="stylesheet/stylus">
 @import "../../common/stylus/variable"
 @import "../../common/stylus/animation.styl"
+.title
+  position fixed
+  top 80px
+  z-index 99
+  width 100%
+  height 20px
+  line-height 20px
+  padding 5px
+  color #409eff
+  background-color #222
 .singer
   position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
   overflow hidden
   width 100%
-  top 40px
+  top 80px
   bottom 0
   .singer-items
     .item-shortcut
@@ -250,20 +283,23 @@ export default {
       line-height 20px
       padding 5px
       color $color-theme
+      background-color #222
     .singer-item
       display flex
       box-sizing border-box
-      padding 5px
-      height 60px
+      padding 10px
+      height 70px
       .image
         flex 0 0 60px
+        img
+          border-radius 50%
       .name
         flex 1
         line-height 50px
         font-size $font-size-medium
   .shortcut
     position absolute
-    top 20px
+    top 40px
     right 10px
     .item
       margin 5px 0

@@ -129,7 +129,7 @@ export default {
     position fixed // 相对于浏览器窗口定位，absoult则是相对于最近的（父元素）position不为static（默认值）的元素进行定位
     overflow hidden
     width 100%
-    top 40px
+    top 80px
     bottom 0
     .slider-wrapper
       position relative
