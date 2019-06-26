@@ -117,7 +117,7 @@ export default {
       height 100%
       .song
         line-height 30px
-        font-size $font-size-min
+        font-size $font-size-medium
         text-overflow ellipsis
         white-space nowrap
         color $color-border

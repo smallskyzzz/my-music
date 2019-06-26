@@ -33,7 +33,7 @@
         </ul>
       </div>
     </scroll>
-    <loading v-show="!singerList.length"></loading>
+    <loading class="loading" v-show="!singerList.length"></loading>
     <transition name="page-fade-in">
       <router-view></router-view>
     </transition>
@@ -309,4 +309,7 @@ export default {
       font-size $font-size-min
       &.current
         color $color-theme
+/deep/ .loading
+  position fixed
+  top 150px
 </style>

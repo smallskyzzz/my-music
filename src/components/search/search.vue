@@ -215,9 +215,10 @@ export default {
     .hot-item
       padding-top 10px
       .item + .item
-        margin 0  0  0 5px
+        padding 5px 0 5px 5px
       .item
-        font-size $font-size-min
+        display inline-block
+        font-size $font-size-medium
         color $color-border
   .history
     margin 10px 5px 5px 5px
@@ -229,17 +230,18 @@ export default {
       .item
         display flex
         padding 3px
-        font-size $font-size-min
+        font-size $font-size-medium
         color $color-border
         .name
           flex 1
   .songs
     position fixed
-    top 80px
+    top 120px
     bottom 0
     overflow hidden
     .song
       line-height 20px
-      font-size $font-size-min
+      padding 5px
+      font-size $font-size-medium
       color $color-border
 </style>
