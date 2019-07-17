@@ -17,6 +17,13 @@
             <p class="name">{{item.name}}</p>
           </div>
         </div>
+        <h1 class="title">推荐单曲</h1>
+        <ul class="personalizedSongs">
+          <li v-for="(item, index) in personalizedSongs" :key="index" class="item" @click="play(item)">
+            <i class="iconfont icon-customerservice"></i>
+            {{item.name}}
+          </li>
+        </ul>
       </div>
     </scroll>
     <loading v-show="!arrs.length || showLoading"></loading>
@@ -27,7 +34,7 @@
 </template>
 
 <script>
-import {getRecommend, getDetail} from '../../api/recommend'
+import {getRecommend, getDetail, getPersonalizedSongs} from '../../api/recommend'
 import Slider from '../../base/slider/slider'
 import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
@@ -42,6 +49,7 @@ export default {
     return {
       banners: [], // 轮播
       personalized: [], // 推荐歌单
+      personalizedSongs: [], // 推荐歌曲
       showLoading: false // 是否显示loading组件
     }
   },
@@ -79,6 +87,9 @@ export default {
       this.$refs.scroll.$el.style.bottom = bottom
       this.$refs.scroll.refresh()
     },
+    play(item) {
+      this.setCurrentSong(item)
+    },
     _normalizeSong(list) {
       let ret = []
       list.tracks.forEach((track) => {
@@ -99,6 +110,9 @@ export default {
         if (res[1].data.code === 200) {
           this.personalized = res[1].data.result
         }
+        return getPersonalizedSongs()
+      }).then((res) => {
+        this.personalizedSongs = res.data.result
       })
     },
     // _getPersonalized() {
@@ -140,6 +154,7 @@ export default {
       text-align center
       font-size $font-size-max
       color $color-theme
+      background-color #222
     .personalized
       margin 0 5px
       .item
@@ -161,4 +176,11 @@ export default {
           text-overflow ellipsis
           color $color-border
           font-size $font-size-min
+    .personalizedSongs
+      margin 0 10px
+      padding-bottom 20px
+      .item
+        margin 10px 0
+        font-size 16px
+        color #808080
 </style>

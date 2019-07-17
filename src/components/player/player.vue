@@ -79,7 +79,8 @@ export default {
       playing: false, // 是否在播放
       showPlayList: false, // 是否显示播放列表
       showImage: true, // 显示图片还是歌词
-      currentIndex: 0 // 当前所在页面
+      currentIndex: 0, // 当前所在页面
+      scrollFlag: false // 标志是否在滚动歌词
     }
   },
   created() {
@@ -161,6 +162,9 @@ export default {
       const touch = e.touches[0]
       this.touch.startX = touch.pageX
       this.touch.startY = touch.pageY
+      // 设为true并清除setTimeout（防止多次短时间内触发）
+      this.scrollFlag = true
+      clearTimeout(this.delay)
     },
     touchMove(e) {
       if (!this.touch.inited) {
@@ -181,8 +185,12 @@ export default {
         this.currentIndex = 1
       }
     },
-    touchEnd() {
-
+    touchEnd(e) {
+      if (e.target.className === '') {
+        this.delay = setTimeout(() => {
+          this.scrollFlag = false
+        }, 2000)
+      }
     },
     getTimes() {
       let times = []
@@ -242,50 +250,53 @@ export default {
       }
     },
     currentTime(newVal) {
-      let times = this.getTimes()
-      let timesArray = []
-      let nowItem = 0
-      times.forEach((time) => {
-        let arr = time.split(':')
-        let s = (parseInt(arr[0]) * 60 + parseFloat(arr[1])) * 1000
-        timesArray.push(s)
-      })
-      if (newVal < timesArray[0]) {
-        nowItem = 0
-      }
-      if (newVal > timesArray[timesArray.length - 1]) {
-        nowItem = timesArray.length - 1
-      }
-      for (let i = 0; i < timesArray.length; i++) {
-        if (newVal > timesArray[i] && newVal < timesArray[i + 1]) {
-          nowItem = i
-        }
-      }
-      // console.log(nowItem)
-      // console.log(timesArray)
-      setTimeout(() => {
-        let lyricItems = this.$refs.lyricItem
-        if (nowItem !== 0) {
-          if (this.lyric[nowItem].split(']')[1] === '') {
-            this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem - 1])
-          } else {
-            this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem])
-          }
-        }
-        lyricItems.forEach((item, index) => {
-          let flag
-          if (this.lyric[nowItem].split(']')[1] === '') {
-            flag = nowItem - 1
-          } else {
-            flag = nowItem
-          }
-          if (index === flag) {
-            item.style.color = '#409EFF'
-          } else {
-            item.style.color = 'grey'
-          }
+      // 判断是否在滚动冷却期
+      if (!this.scrollFlag) {
+        let times = this.getTimes()
+        let timesArray = []
+        let nowItem = 0
+        times.forEach((time) => {
+          let arr = time.split(':')
+          let s = (parseInt(arr[0]) * 60 + parseFloat(arr[1])) * 1000
+          timesArray.push(s)
         })
-      }, 20)
+        if (newVal < timesArray[0]) {
+          nowItem = 0
+        }
+        if (newVal > timesArray[timesArray.length - 1]) {
+          nowItem = timesArray.length - 1
+        }
+        for (let i = 0; i < timesArray.length; i++) {
+          if (newVal > timesArray[i] && newVal < timesArray[i + 1]) {
+            nowItem = i
+          }
+        }
+        // console.log(nowItem)
+        // console.log(timesArray)
+        setTimeout(() => {
+          let lyricItems = this.$refs.lyricItem
+          if (nowItem !== 0) {
+            if (this.lyric[nowItem].split(']')[1] === '') {
+              this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem - 1])
+            } else {
+              this.$refs.lyricScroll.scrollToElement(lyricItems[nowItem])
+            }
+          }
+          lyricItems.forEach((item, index) => {
+            let flag
+            if (this.lyric[nowItem].split(']')[1] === '') {
+              flag = nowItem - 1
+            } else {
+              flag = nowItem
+            }
+            if (index === flag) {
+              item.style.color = '#409EFF'
+            } else {
+              item.style.color = 'grey'
+            }
+          })
+        }, 20)
+      }
     }
   },
   computed: {
@@ -405,7 +416,7 @@ export default {
     bottom 0
     width 100%
     height 60px
-    background $color-background
+    background #222
     z-index 100
     .left
       flex 1

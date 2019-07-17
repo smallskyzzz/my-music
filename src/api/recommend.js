@@ -25,6 +25,18 @@ function getPersonalized() {
   return promise
 }
 
+export function getPersonalizedSongs() {
+  let promise = new Promise((resolve, reject) => {
+    axios.get('http://47.93.219.17:3000' + '/personalized/newsong').then((res) => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+
+  return promise
+}
+
 export function getRecommend() {
   return Promise.all([getBanner(), getPersonalized()])
 }
