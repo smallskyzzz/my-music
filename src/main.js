@@ -11,11 +11,14 @@ import 'element-ui/packages/theme-chalk/src/index.scss'
 import './common/stylus/index.styl'
 import './common/fonts/iconfont.css'
 
+import VueVideoPlayer from 'vue-video-player'
+
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(VueLazyLoad, {
   loading: require('./loading2.gif')
 })
+Vue.use(VueVideoPlayer)
 
 /* eslint-disable no-new */
 new Vue({

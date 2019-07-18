@@ -24,6 +24,16 @@
             {{item.name}}
           </li>
         </ul>
+        <h1 class="title">推荐MV</h1>
+        <ul class="personalizedMV">
+          <li v-for="(item, index) in personalizedMV" :key="index" class="item" @click="playMV(item)">
+            {{item.name}}
+          </li>
+        </ul>
+        <div class="player-wrapper" v-show="playMVFlag" ref="playerWrapper">
+          <i class="iconfont icon-close close" @click="closeMV"></i>
+          <player :MV="MV"></player>
+        </div>
       </div>
     </scroll>
     <loading v-show="!arrs.length || showLoading"></loading>
@@ -34,7 +44,7 @@
 </template>
 
 <script>
-import {getRecommend, getDetail, getPersonalizedSongs} from '../../api/recommend'
+import {getRecommend, getDetail, getPersonalizedSongs, getMV} from '../../api/recommend'
 import Slider from '../../base/slider/slider'
 import Scroll from '../../base/scroll/scroll'
 import {mapMutations} from 'vuex'
@@ -42,6 +52,7 @@ import Song from '../../common/js/song'
 import Singer from '../../common/js/singer'
 import {playerMixin} from '../../common/js/mixin'
 import Loading from '../../base/loading/loading'
+import Player from '../../base/video-player/video-player'
 
 export default {
   mixins: [playerMixin],
@@ -50,6 +61,9 @@ export default {
       banners: [], // 轮播
       personalized: [], // 推荐歌单
       personalizedSongs: [], // 推荐歌曲
+      personalizedMV: [], // 推荐MV
+      playMVFlag: false,
+      MV: {},
       showLoading: false // 是否显示loading组件
     }
   },
@@ -90,6 +104,13 @@ export default {
     play(item) {
       this.setCurrentSong(item)
     },
+    playMV(item) {
+      this.playMVFlag = true
+      this.MV = item
+    },
+    closeMV() {
+      this.playMVFlag = false
+    },
     _normalizeSong(list) {
       let ret = []
       list.tracks.forEach((track) => {
@@ -113,6 +134,9 @@ export default {
         return getPersonalizedSongs()
       }).then((res) => {
         this.personalizedSongs = res.data.result
+        return getMV()
+      }).then((res) => {
+        this.personalizedMV = res.data.data
       })
     },
     // _getPersonalized() {
@@ -131,7 +155,8 @@ export default {
   components: {
     Slider,
     Scroll,
-    Loading
+    Loading,
+    Player
   }
 }
 </script>
@@ -176,11 +201,20 @@ export default {
           text-overflow ellipsis
           color $color-border
           font-size $font-size-min
-    .personalizedSongs
+    .personalizedSongs,.personalizedMV
       margin 0 10px
-      padding-bottom 20px
       .item
         margin 10px 0
         font-size 16px
         color #808080
+    .player-wrapper
+      position fixed
+      left 0
+      right 0
+      bottom 0
+      .close
+        position absolute
+        top 10px
+        right 10px
+        z-index 20
 </style>

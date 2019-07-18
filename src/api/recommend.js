@@ -52,3 +52,25 @@ export function getDetail(id) {
   })
   return promise
 }
+
+export function getMV() {
+  let promise = new Promise((resolve, reject) => {
+    axios.get('http://47.93.219.17:3000' + '/mv/first?limit=10').then((res) => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+  return promise
+}
+
+export function getMVUrl(id) {
+  let promise = new Promise((resolve, reject) => {
+    axios.get(`http://47.93.219.17:3000/mv/url?id=${id}`).then((res) => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+  return promise
+}

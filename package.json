@@ -19,7 +19,9 @@
     "vue-lazyload": "^1.2.6",
     "pinyin": "^2.8.3",
     "vuex": "^3.0.1",
-    "good-storage": "^1.1.0"
+    "good-storage": "^1.1.0",
+    "videojs-contrib-hls.js": "^3.2.0",
+    "vue-video-player": "^5.0.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
