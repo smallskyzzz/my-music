@@ -14,7 +14,7 @@
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "element-ui": "^2.4.11",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "better-scroll": "^1.13.2",
     "vue-lazyload": "^1.2.6",
     "pinyin": "^2.8.3",
